@@ -1,0 +1,2 @@
+# Fiber Tampering Machine
+Hi, I am currently working on an embedded system project where I build a fiber tampering machine. I upload all code and documents here and share updates as the project progresses. <3

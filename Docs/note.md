@@ -130,17 +130,31 @@ _m_tp_dev tp_dev=
 ```
 <br>
 
+## 如何更改横/竖屏
+到`tftlcd.c`文件下找到`void TFTLCD_Init(void)`函数，修改以下语句：
+```c
+LCD_Display_Dir(1);		// 1为横屏显示，0为竖屏显示
+```
+<br>
+
 # emWin绘制界面
 ## 一、VS2019 对 emWin 模拟器编译不成功的解决办法
 
 [法1](https://www.jianshu.com/p/bec48e0de882)<br>
 [法2](https://blog.csdn.net/zhuw86/article/details/89186272)
 
-1、右键单击项目（如 simulationtrial） ->属性<br>
-2、 选择配置为“所有配置”<br>
-3、 选择配置属性>链接器>输入<br>
-4、 设置忽略所有默认库选项为：“否”<br>
-5、 设置忽略特定的默认库选项为：“LIBC.lib;LIBCMTD.lib”<br>
+1、配置仿真工程属性。成功打开工程后，右键单击SimulationTrial项目，在弹出的选项中选择属性，见图 配置emWin仿真工程属性；<br>
+2、选择配置属性 > 链接器 > 输入<br> 
+3、在其中的附加依赖项中添加：`legacy_stdio_definitions.lib`，注意添加分号；<br>
+4、在忽略所有默认库中填：否；<br>
+5、在忽略特定默认库中添加：`LIBC.lib;LIBCMTD.lib`，具体见图 配置工程链接器输入属性 <br>
+6、接下来转到链接器选项中的高级设置，修改映像具有安全异常处理程序的值为：否；<br>
+<br>
+
+### 补充
+1. <a href="https://www.armbbs.cn/forum.php?mod=viewthread&tid=93882">运行【STemWin5.42】有些例子找不到GUIDRV_Lin.h处理办法</a>
+
+<br>
 
 ## 二、调整VS2019中模拟界面大小的方法
 在`Config`文件夹下的`LCDConf.c`文件中修改`XSIZE_PHYS`和`YSIZE_PHYS	`这两个宏定义:

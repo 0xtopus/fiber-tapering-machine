@@ -290,3 +290,74 @@ case WM_NOTIFY_PARENT:
 
 
 
+## 六、汉字显示
+
+### Unicode
+
+> Unicode目前通用的实现方式是 UTF-16 小端序（LE）、UTF-16 大端序（BE）和 UTF-8。在微软公司 Windows XP 附带的记事本（Notepad）中，“另存为”对话框可以选择的四种编码方式除去非 Unicode 编码的 ANSI（对于英文系统即 ASCII 编码，中文系统则为 GB2312 或 Big5 编码）外，其余三种为“**Unicode”（对应 UTF-16 LE）**、“Unicode big endian”（对应 UTF-16 BE）和“UTF-8”。
+
+### 让控件显示中文
+
+详见《安富莱_STM32-V7开发板第3版emWin教程》第28章。
+
+首先可以用GUIBuilder创建一个带有控件的界面。
+
+这里介绍**使用FontConverter对需要使用的某些特定的汉字生成对应的`.c`文件**，而不是生成整个字库的方法，适合使用汉字量较少的情况。
+
+1. 创建一个记事本，在里面输入你需要使用的汉字，这里我输入：`开始停止` 为例。
+2. 另存为记事本，文件名可以根据你的需要命名，建议简洁易懂，比如`FontSong16.txt`，编码设置为`Unicode`（Win10请选择`UTF-16 LE`）
+3. 打开FontConverter软件，选择字体类型，编码（比如Standard，16 Bit UNICODE)，点击确定，选择字体，字形和大小（比如“宋体”，“常规”，“16”），Unit of Size 可以选择Pixels，这样就可以手动添加点阵字体的大小
+4. 之后点击菜单栏上的“Edit”选项，点击“Disable all characters"
+5. 点击菜单栏上的“Edit”选项，点击"Read pattern file"，之后找到并选择你刚刚新建的记事本文件，比如我的是`FontSong16.txt`
+6. 点击File->Save as...，将你的字体文件保存为`.c`文件，文件名可自取，但不能包含中文
+7. 创建好字体文件后，可以把字体文件放到你的界面文件的工程文件夹里了，下面介绍一下如何编辑代码使你界面里的控件可以显示你的字体
+8. 打开生成的字体 `.c ` 文件，你会看到一行类似这样的语句：
+```c
+extern GUI_CONST_STORAGE GUI_FONT GUI_FontFontSong16;
+```
+9. 打开GUIBuilder生成的 `.c ` 界面文件，把上面声明外部变量的语句复制到里面。
+9. 在`MainTask()`函数里打开UTF8编码：
+
+```c
+void MainTask(void)
+{
+	...
+        
+    /* 使用UTF8编码 */
+	GUI_UC_SetEncodeUTF8();
+
+    ...
+}
+```
+
+11. 假如你的界面里有一个BUTTOM按钮要使用中文字符：
+
+```c
+static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
+    {FRAMEWIN_CreateIndirect, "Motor_Controller", ID_FRAMEWIN_0, 0, 0, 800, 480, 0, 0x64, 0},
+    {BUTTON_CreateIndirect, "开始", ID_BUTTON_0, 326, 309, 100, 45, 0, 0x0, 0},	// 设置为中文字体
+}
+...
+static void _cbDialog(WM_MESSAGE *pMsg){
+    switch (pMsg->MsgId)
+    {
+    	case WM_INIT_DIALOG:
+            hItem = pMsg->hWin;
+            BUTTON_SetFont(WM_GetDialogItem(hItem, ID_BUTTON_0), &GUI_FontFontSong16);	// 设置为中文字体，注意取地址号"&"
+            ...
+}
+```
+
+你也可以使用其他API来设置：
+
+```c
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
+		BUTTON_SetFont(WM_GetDialogItem(hItem, ID_BUTTON_0), &GUI_FontFontSong16);	// 设置为中文字体，注意取地址号"&"
+		BUTTON_SetText(hItem, "停止");
+```
+
+
+
+12. 修改GUIBuilder生成的 `.c ` 界面文件为 UTF-8 编码（不是修改 FontCvt 生成的 C文件为 UTF-8 编码！): 用记事本打开，然后另存为的时候把编码改成UTF-8，保存到原位置替换掉原文件即可。
+13. 之后你可以使用VS2019来仿真一下。如果出现 “**报错 error C2001:常量中有换行符**” ，请参考：<a href="https://blog.csdn.net/love_0_love/article/details/120024094">这篇帖子</a>解决。
+14. 你也可以直接移植到MDK5。移植方法和之前类似，就是记得要把`.c`字符文件也添加进工程。然后打开魔法棒工具，在 options->c/c++->Misc controls 栏填写 “`--locale=english`”防止报错。

@@ -22,7 +22,7 @@
 // USER END
 
 #include "DIALOG.h"
-
+#include "motorcontrol.h"
 /*********************************************************************
  *
  *       Defines
@@ -38,6 +38,7 @@
 #define ID_EDIT_1 (GUI_ID_USER + 0x13)
 #define ID_TEXT_1 (GUI_ID_USER + 0x14)
 #define ID_BUTTON_2 (GUI_ID_USER + 0x15)
+#define ID_TEXT_2 (GUI_ID_USER + 0x16)
 
 #define FontMenuSong24  &GUI_FontMenuSong24
 #define FontMenuMSBlack24 &GUI_FontMenuMSBlack24
@@ -67,6 +68,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
     {TEXT_CreateIndirect, "SampleData:", ID_TEXT_1, 135, 325, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "ChangeMode", ID_BUTTON_2, 185, 450, 100, 60, 0, 0x0, 0},
     // USER START (Optionally insert additional widgets)
+    {TEXT_CreateIndirect, "Direction", ID_TEXT_2, 185, 390, 80, 40, 0, 0x0, 0},
     // USER END
 };
 
@@ -88,10 +90,10 @@ extern WM_HWIN PageItem;
 static void _cbDialog(WM_MESSAGE *pMsg)
 {
   WM_HWIN hItem;
-  WM_HWIN parentItem;
   int NCode;
   int Id;
-  // USER START (Optionally insert additional variables)
+  //! USER START (Optionally insert additional variables)
+  int v;
   // USER END
 
   switch (pMsg->MsgId)
@@ -148,10 +150,16 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     //! Initialization of 'Slider'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
-    SLIDER_SetRange(hItem, 0, 5000);
+    SLIDER_SetRange(hItem, 500, 5000);
 
     // USER START (Optionally insert additional code for further widget initialization)
-
+    // TODO： 改字模
+    //! Initialization of 'Direction'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
+    TEXT_SetFont(hItem, FontMenuMSBlack24);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetText(hItem, "向左");
     // USER END
     break;
   case WM_NOTIFY_PARENT:
@@ -167,7 +175,10 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
+        //TODO USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        v = SLIDER_GetValue(hItem);
+        printf("%d\r\n", v);
         // USER END
         break;
       case WM_NOTIFICATION_VALUE_CHANGED:

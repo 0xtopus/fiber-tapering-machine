@@ -5,6 +5,8 @@
         "pwmout.h": "c",
         "timer.h": "c",
         "stm32f7xx_hal.h": "c",
-        "dialog.h": "c"
+        "dialog.h": "c",
+        "motorcontrol.h": "c",
+        "usart.h": "c"
     }
 }

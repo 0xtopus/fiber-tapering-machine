@@ -335,7 +335,7 @@
               <MiscControls>--locale=english</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F767xx,ARM_MATH_CM7,__CC_ARM,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING,__FPU_PRESENT=1</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F7xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\KEY;..\HARDWARE\LED;..\HARDWARE\SDRAM;..\HARDWARE\LCD;..\HARDWARE\IIC;..\HARDWARE\TIMER;..\HARDWARE\24CXX;..\HARDWARE\TOUCH;..\HARDWARE\MPU;..\USMART;..\MALLOC;..\EMWIN\Demo;..\DSP_LIB\Include;..\EMWIN\STemWin\inc;..\EMWIN\STemWin\Config;..\HARDWARE\PWMOUT</IncludePath>
+              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F7xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\KEY;..\HARDWARE\LED;..\HARDWARE\SDRAM;..\HARDWARE\LCD;..\HARDWARE\IIC;..\HARDWARE\TIMER;..\HARDWARE\24CXX;..\HARDWARE\TOUCH;..\HARDWARE\MPU;..\USMART;..\MALLOC;..\EMWIN\Demo;..\DSP_LIB\Include;..\EMWIN\STemWin\inc;..\EMWIN\STemWin\Config;..\HARDWARE\PWMOUT;..\HARDWARE\MOTORCONTROL</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -625,9 +625,9 @@
               <FilePath>..\HARDWARE\TOUCH\gt9271.c</FilePath>
             </File>
             <File>
-              <FileName>pwmout.c</FileName>
+              <FileName>motorcontrol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\PWMOUT\pwmout.c</FilePath>
+              <FilePath>..\HARDWARE\MOTORCONTROL\motorcontrol.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1412,9 +1412,9 @@
               <FilePath>..\HARDWARE\TOUCH\gt9271.c</FilePath>
             </File>
             <File>
-              <FileName>pwmout.c</FileName>
+              <FileName>motorcontrol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDWARE\PWMOUT\pwmout.c</FilePath>
+              <FilePath>..\HARDWARE\MOTORCONTROL\motorcontrol.c</FilePath>
             </File>
           </Files>
         </Group>

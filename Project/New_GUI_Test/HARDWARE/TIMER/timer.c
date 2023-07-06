@@ -61,7 +61,7 @@ void TIM4_Init(u16 arr, u16 psc)
 
 //! Timer2 PWM PA5/PA1 output
 //! 此函数是配置Timer2在PA5和PA1引脚输出PWM的初始化函数
-void TIM2_PWM_Init(u16 arr, u16 psc, pwmout_struct pwmout_config)
+void TIM2_PWM_Init(u16 arr, u16 psc, u8 direction)
 {
     TIM2_Handler.Instance = TIM2;
     TIM2_Handler.Init.Prescaler = psc;                  // 定时器分频
@@ -70,22 +70,26 @@ void TIM2_PWM_Init(u16 arr, u16 psc, pwmout_struct pwmout_config)
     TIM2_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     HAL_TIM_PWM_Init(&TIM2_Handler); // 初始化PWM
 
-    TIM2_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                  // 模式选择PWM1
-    TIM2_CH1Handler.Pulse = arr / 2;                                           //! 设置比较值,此值用来确定占空比，
-    TIM2_CH2Handler.OCMode = TIM_OCMODE_PWM1;                                  // 模式选择PWM1
-    TIM2_CH2Handler.Pulse = arr / 2;                                           //! 设置比较值,此值用来确定占空比，
-                                                                               // 默认比较值为自动重装载值的一半,即占空比为50%
-    TIM2_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                           // 输出比较极性为低
-    HAL_TIM_PWM_ConfigChannel(&TIM2_Handler, &TIM2_CH1Handler, TIM_CHANNEL_1); //! 配置TIM2通道1
-    HAL_TIM_PWM_ConfigChannel(&TIM2_Handler, &TIM2_CH2Handler, TIM_CHANNEL_2); //! 配置TIM2通道2
-    if (pwmout_config.left_motor)   //! 如果左马达需要转动
+    
+    if (direction)    //! If the left motor needs to get away
     {
-        HAL_TIM_PWM_Start(&TIM2_Handler, TIM_CHANNEL_1); //! 开启PWM通道1
+        TIM2_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                            // 输出比较极性为低
+        TIM2_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                   // 模式选择PWM1
+        TIM2_CH1Handler.Pulse = arr / 2;                                            //! 设置比较值,此值用来确定占空比，
+                                                                                    //! 占空比对我们的电机转速没有的影响
+                                                                                    // 默认比较值为自动重装载值的一半,即占空比为50%
+        HAL_TIM_PWM_ConfigChannel(&TIM2_Handler, &TIM2_CH1Handler, TIM_CHANNEL_1);  //! 配置TIM2通道1
+        HAL_TIM_PWM_Start(&TIM2_Handler, TIM_CHANNEL_1);
     }
-
-    if (pwmout_config.right_motor)  //! 如果右马达需要转动
-    {
-        HAL_TIM_PWM_Start(&TIM2_Handler, TIM_CHANNEL_2); //! 开启PWM通道2
+    else               //! If the left motor needs to get closer
+    { 
+        TIM2_CH2Handler.OCPolarity = TIM_OCPOLARITY_LOW;                            // 输出比较极性为低
+        TIM2_CH2Handler.OCMode = TIM_OCMODE_PWM1;                                   // 模式选择PWM1
+        TIM2_CH2Handler.Pulse = arr / 2;                                            //! 设置比较值,此值用来确定占空比，
+                                                                                    //! 占空比对我们的电机转速没有的影响
+                                                                                    // 默认比较值为自动重装载值的一半,即占空比为50%
+        HAL_TIM_PWM_ConfigChannel(&TIM2_Handler, &TIM2_CH2Handler, TIM_CHANNEL_2);  //! 配置TIM2通道2
+        HAL_TIM_PWM_Start(&TIM2_Handler, TIM_CHANNEL_2);
     }
 }
 
@@ -109,7 +113,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     }
 }
 
-// 定时器底册驱动，开启时钟，设置中断优先级
+// 定时器底层驱动，开启时钟，设置中断优先级
 // 此函数会被HAL_TIM_Base_Init()函数调用
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {

@@ -322,7 +322,8 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontFontSong16;
 void MainTask(void)
 {
 	...
-        
+    /* 初始化 */
+    GUI_Init();
     /* 使用UTF8编码 */
 	GUI_UC_SetEncodeUTF8();
 
@@ -359,5 +360,9 @@ static void _cbDialog(WM_MESSAGE *pMsg){
 
 
 12. 修改GUIBuilder生成的 `.c ` 界面文件为 UTF-8 编码（不是修改 FontCvt 生成的 C文件为 UTF-8 编码！): 用记事本打开，然后另存为的时候把编码改成UTF-8，保存到原位置替换掉原文件即可。
-13. 之后你可以使用VS2019来仿真一下。如果出现 “**报错 error C2001:常量中有换行符**” ，请参考：<a href="https://blog.csdn.net/love_0_love/article/details/120024094">这篇帖子</a>解决。
+13. 之后你可以使用VS2019来仿真一下。如果出现 “**报错 error C2001:常量中有换行符**” ，请参考：<a href="https://blog.csdn.net/love_0_love/article/details/120024094">这篇帖子</a>解决。( 项目->右键属性->C/C++ -> 命令行，，在下方输入框添加` /utf-8`，就会在编译时采用utf-8编码来编译)
 14. 你也可以直接移植到MDK5。移植方法和之前类似，就是记得要把`.c`字符文件也添加进工程。然后打开魔法棒工具，在 options->c/c++->Misc controls 栏填写 “`--locale=english`”防止报错。
+
+## 七、其他注意事项
+
+改变Timer的周期时，请先停止再重新初始化，直接改寄存器会出bug

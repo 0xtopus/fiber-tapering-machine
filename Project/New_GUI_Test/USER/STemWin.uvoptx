@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>STemWin MCULCD</TargetName>
+    <TargetName>Fiber_tampering</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

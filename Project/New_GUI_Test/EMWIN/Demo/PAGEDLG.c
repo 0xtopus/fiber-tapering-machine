@@ -38,6 +38,7 @@
 #define MenuFont24 &GUI_FontFontMenu24
 #define FontMenuSong24 &GUI_FontMenuSong24
 #define FontMenuMSBlack24 &GUI_FontMenuMSBlack24
+
 // USER START (Optionally insert additional defines)
 // USER END
 
@@ -53,6 +54,7 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontFontMenu24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 
+extern WM_HWIN DualDirectionItem;
 /*********************************************************************
  *
  *       Static data
@@ -188,9 +190,9 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             BUTTON_SetText(hItem, "停止");
             Motor_Start(&MotorConfig);
           }
-          // TODO 
-          printf("\r\nsstartpressed\r\n");
-          printf("\r\n%u\r\n", MotorConfig.direction);
+          // TODO
+          //printf("\r\nsstartpressed\r\n");
+          //printf("\r\n%u\r\n", MotorConfig.direction);
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -207,18 +209,20 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_RELEASED:
       {
         // Switch the direction of motor
-        
+        // TODO printf del
         printf("\r\ndir presed\r\n");
-        if (MotorConfig.enable)
+        if (ChangeDirection(&MotorConfig))
         {
-          // Reinit the Motorconfig
-          Motor_Stop(&MotorConfig);
-          MotorConfig.direction = !MotorConfig.direction;
-          Motor_Start(&MotorConfig);
-        } else {
-          MotorConfig.direction = !MotorConfig.direction;
+          TEXT_SetFont(DualDirectionItem, FontMenuMSBlack24);
+          TEXT_SetTextAlign(DualDirectionItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+          TEXT_SetText(DualDirectionItem, "向左");
         }
-        
+        else
+        {
+          TEXT_SetFont(DualDirectionItem, FontMenuMSBlack24);
+          TEXT_SetTextAlign(DualDirectionItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+          TEXT_SetText(DualDirectionItem, "向右");
+        }
       }
       break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -268,7 +272,7 @@ void MainTask(void)
   GUI_Init();
   /* 使用UTF-8编码 */
   GUI_UC_SetEncodeUTF8();
-  /* 创建对话框，使用 GUIBulder5.28 生成的对话框创建函数 */
+  /* 创建对话框，使用对话框创建函数 */
   CreateFramewin();
   while (1)
   {

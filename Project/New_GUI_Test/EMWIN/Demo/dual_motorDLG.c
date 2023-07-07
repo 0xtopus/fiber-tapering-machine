@@ -39,9 +39,27 @@
 #define ID_TEXT_1 (GUI_ID_USER + 0x14)
 #define ID_BUTTON_2 (GUI_ID_USER + 0x15)
 #define ID_TEXT_2 (GUI_ID_USER + 0x16)
+#define ID_TEXT_3 (GUI_ID_USER + 0x17)
+#define ID_EDIT_2 (GUI_ID_USER + 0x18)
+#define ID_TEXT_4 (GUI_ID_USER + 0x19)
+#define ID_EDIT_3 (GUI_ID_USER + 0x1A)
 
 #define FontMenuSong24  &GUI_FontMenuSong24
 #define FontMenuMSBlack24 &GUI_FontMenuMSBlack24
+
+/*********************************************************************
+ *
+ *       Global data
+ *
+ **********************************************************************
+ */
+
+extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
+extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
+extern WM_HWIN PageItem;
+
+WM_HWIN DualDirectionItem;
+
 /*********************************************************************
  *
  *       Static data
@@ -49,9 +67,6 @@
  **********************************************************************
  */
 
-
-extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
-extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 
 /*********************************************************************
  *
@@ -64,11 +79,17 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
     {BUTTON_CreateIndirect, "UP", ID_BUTTON_0, 370, 135, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "Down", ID_BUTTON_1, 370, 235, 80, 40, 0, 0x0, 0},
     {EDIT_CreateIndirect, "DualSpeed", ID_EDIT_0, 370, 185, 80, 40, 0, 0x64, 0},
-    {EDIT_CreateIndirect, "Data", ID_EDIT_1, 225, 325, 80, 40, 0, 0x64, 0},
-    {TEXT_CreateIndirect, "SampleData:", ID_TEXT_1, 135, 325, 80, 40, 0, 0x0, 0},
-    {BUTTON_CreateIndirect, "ChangeMode", ID_BUTTON_2, 185, 450, 100, 60, 0, 0x0, 0},
+    {EDIT_CreateIndirect, "Data", ID_EDIT_1, 215, 445, 80, 40, 0, 0x64, 0},
+    {TEXT_CreateIndirect, "SampleData:", ID_TEXT_1, 130, 445, 80, 40, 0, 0x0, 0},
+    {BUTTON_CreateIndirect, "ChangeMode", ID_BUTTON_2, 185, 550, 100, 60, 0, 0x0, 0},
     // USER START (Optionally insert additional widgets)
-    {TEXT_CreateIndirect, "Direction", ID_TEXT_2, 185, 390, 80, 40, 0, 0x0, 0},
+    {TEXT_CreateIndirect, "Direction", ID_TEXT_2, 190, 495, 80, 40, 0, 0x0, 0},
+
+    {TEXT_CreateIndirect, "LeftRealSpeed", ID_TEXT_3, 95, 305, 80, 40, 0, 0x64, 0},
+    {EDIT_CreateIndirect, "LRsp", ID_EDIT_2, 95, 350, 80, 40, 0, 0x64, 0},
+    {TEXT_CreateIndirect, "RightRealSpeed", ID_TEXT_4, 310, 305, 80, 40, 0, 0x64, 0},
+    {EDIT_CreateIndirect, "RRsp", ID_EDIT_3, 310, 350, 80, 40, 0, 0x64, 0}
+
     // USER END
 };
 
@@ -80,7 +101,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
  */
 
 // USER START (Optionally insert additional static code)
-extern WM_HWIN PageItem;
+
 // USER END
 
 /*********************************************************************
@@ -90,10 +111,12 @@ extern WM_HWIN PageItem;
 static void _cbDialog(WM_MESSAGE *pMsg)
 {
   WM_HWIN hItem;
+  WM_HWIN editItem;
   int NCode;
   int Id;
   //! USER START (Optionally insert additional variables)
   int v;
+  char str[6] = {0};
   // USER END
 
   switch (pMsg->MsgId)
@@ -123,7 +146,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'DualSpeed'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-    EDIT_SetText(hItem, "0");
+    EDIT_SetText(hItem, "500");
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     //
@@ -139,7 +162,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
     TEXT_SetFont(hItem, FontMenuMSBlack24);
     TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-    TEXT_SetText(hItem, "转速");
+    TEXT_SetText(hItem, "采样");
     //
     // Initialization of 'ChangeMode'
     //
@@ -153,13 +176,42 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     SLIDER_SetRange(hItem, 500, 5000);
 
     // USER START (Optionally insert additional code for further widget initialization)
-    // TODO： 改字模
+    // TODO 改字
     //! Initialization of 'Direction'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
+    DualDirectionItem = hItem;
     TEXT_SetFont(hItem, FontMenuMSBlack24);
     TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-    TEXT_SetText(hItem, "向左");
+    TEXT_SetText(hItem, "向右");
+    //
+    //! Initialization of "LeftRealSpeed"
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
+    TEXT_SetFont(hItem, FontMenuMSBlack24);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetText(hItem, "左转速");
+    //
+    //! Initialization of "RightRealSpeed"
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
+    TEXT_SetFont(hItem, FontMenuMSBlack24);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetText(hItem, "右转速");
+    //
+    //! Initialization of "LRsp"
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+    EDIT_SetText(hItem, "0");
+    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    //
+    //! Initialization of "RRsp"
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+    EDIT_SetText(hItem, "0");
+    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     // USER END
     break;
   case WM_NOTIFY_PARENT:
@@ -176,13 +228,16 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         //TODO USER START (Optionally insert code for reacting on notification message)
-        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
-        v = SLIDER_GetValue(hItem);
-        printf("%d\r\n", v);
         // USER END
         break;
       case WM_NOTIFICATION_VALUE_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        v = SLIDER_GetValue(hItem);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+        EDIT_SetText(editItem, Int2String(v, str));
+        ChangeSpeed(&MotorConfig, (u16)v);
+        
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -197,8 +252,22 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
+        
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+        if (MotorConfig.set_left_speed - 100 > 500 && MotorConfig.set_left_speed - 100 > 500)
+        {
+          EDIT_GetText(editItem, str, 5);
+          v = String2Int(str);
+          ChangeSpeed(&MotorConfig, (u16)v + 100);
+          EDIT_SetText(editItem, Int2String(v + 100, str));
+          SLIDER_SetValue(hItem, v + 100);
+        } else {
+          // Set to maximum speed if the upper limit is reached
+          ChangeSpeed(&MotorConfig, 5000);
+          EDIT_SetText(editItem, "5000");
+          SLIDER_SetValue(hItem, 5000);
+        }
         break;
         // USER START (Optionally insert additional code for further notification handling)
         // USER END
@@ -212,8 +281,21 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER END
         break;
       case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+        if (MotorConfig.set_left_speed + 100 < 5000 && MotorConfig.set_left_speed + 100 < 5000)
+        {
+          EDIT_GetText(editItem, str, 5);
+          v = String2Int(str);
+          ChangeSpeed(&MotorConfig, (u16)v - 100);
+          EDIT_SetText(editItem, Int2String(v - 100, str));
+          SLIDER_SetValue(hItem, v - 100);
+        } else {
+          // Set to maximum speed if the upper limit is reached
+          ChangeSpeed(&MotorConfig, 500);
+          EDIT_SetText(editItem, "500");
+          SLIDER_SetValue(hItem, 500);
+        }
         break;
         // USER START (Optionally insert additional code for further notification handling)
         // USER END

@@ -56,8 +56,10 @@
 
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
-extern WM_HWIN PageItem;
+//extern WM_HWIN PageItem;
+extern WM_HWIN SingleMotorWIN;
 
+WM_HWIN DualMotorWIN;
 WM_HWIN DualDirectionItem;
 WM_HWIN EditLeftRealSpeed;
 WM_HWIN EditRightRealSpeed;
@@ -144,13 +146,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_1);
     BUTTON_SetFont(hItem, FontMenuSong24);
     BUTTON_SetText(hItem, "▼");
-    //
-    // Initialization of 'DualSpeed'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-    EDIT_SetText(hItem, "500");
-    EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    
     //
     // Initialization of 'Data'
     //
@@ -176,7 +172,16 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
     SLIDER_SetRange(hItem, 500, 5000);
-
+    SLIDER_SetValue(hItem, 500);
+    
+    //
+    // Initialization of 'DualSpeed'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+    EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    EDIT_SetText(hItem, "500");
+    
     // USER START (Optionally insert additional code for further widget initialization)
     // TODO 改字
     //! Initialization of 'Direction'
@@ -205,17 +210,17 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
     EditLeftRealSpeed = hItem;
-    EDIT_SetText(hItem, "0");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetText(hItem, "0");
     //
     //! Initialization of "RRsp"
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
     EditRightRealSpeed = hItem;
-    EDIT_SetText(hItem, "0");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetText(hItem, "0");
     // USER END
     break;
   case WM_NOTIFY_PARENT:
@@ -393,10 +398,14 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
       {
+        //MotorConfig.dual_motor_speed = MotorConfig.set_left_speed;
         //! Change the manual control page between Dual/Single Motor
-        MULTIPAGE_AttachWindow(PageItem, 0, Createsingle_motor());
+        //MULTIPAGE_AttachWindow(PageItem, 0, Createsingle_motor());
+        //WM_DeleteWindow(DualMotorWIN);
         // WM_HideWindow(pMsg->hWin);
-        // WM_ShowWindow(Createsingle_motor());
+        WM_HideWindow(DualMotorWIN);
+        WM_ShowWindow(SingleMotorWIN);
+        
       }
 
       break;
@@ -432,6 +441,7 @@ WM_HWIN Createdual_motor(void)
   WM_HWIN hWin;
 
   hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
+  DualMotorWIN = hWin;
   return hWin;
 }
 

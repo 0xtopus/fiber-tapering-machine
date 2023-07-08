@@ -22,7 +22,7 @@
 // USER END
 
 #include "DIALOG.h"
-
+#include "motorcontrol.h"
 /*********************************************************************
  *
  *       Defines
@@ -45,8 +45,12 @@
 #define ID_BUTTON_6 (GUI_ID_USER + 0x23)
 #define ID_EDIT_2 (GUI_ID_USER + 0x25)
 #define ID_TEXT_2 (GUI_ID_USER + 0x26)
+#define ID_TEXT_3 (GUI_ID_USER + 0x27)
+#define ID_TEXT_4 (GUI_ID_USER + 0x28)
+#define ID_EDIT_3 (GUI_ID_USER + 0x29)
+#define ID_EDIT_4 (GUI_ID_USER + 0x2A)
 
-#define FontMenuSong24  &GUI_FontMenuSong24
+#define FontMenuSong24 &GUI_FontMenuSong24
 #define FontMenuMSBlack24 &GUI_FontMenuMSBlack24
 /*********************************************************************
  *
@@ -55,17 +59,22 @@
  **********************************************************************
  */
 
-
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 
+extern GUI_HWIN DualMotorWIN;
+extern StartItem;
+
+WM_HWIN SingleMotorWIN;
+GUI_HWIN LeftStopItem;
+GUI_HWIN RightStopItem;
 /*********************************************************************
  *
  *       _aDialogCreate
  */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
     {WINDOW_CreateIndirect, "single_motor", ID_WINDOW_0, 5, 45, 470, 675, 0, 0x0, 0},
-    {BUTTON_CreateIndirect, "ChangeMode", ID_BUTTON_0, 185, 580, 100, 60, 0, 0x0, 0},
+    {BUTTON_CreateIndirect, "ChangeMode", ID_BUTTON_0, 185, 600, 100, 60, 0, 0x0, 0},
     {TEXT_CreateIndirect, "L_Motor", ID_TEXT_0, 10, 165, 80, 40, 0, 0x0, 0},
     {SLIDER_CreateIndirect, "Slider", ID_SLIDER_0, 100, 155, 250, 70, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "LUP", ID_BUTTON_1, 370, 115, 80, 40, 0, 0x0, 0},
@@ -76,11 +85,15 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
     {TEXT_CreateIndirect, "R_Motor", ID_TEXT_1, 10, 360, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "RUP", ID_BUTTON_4, 370, 310, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "RDown", ID_BUTTON_5, 370, 410, 80, 40, 0, 0x0, 0},
-    {EDIT_CreateIndirect, "Edit", ID_EDIT_1, 370, 360, 80, 40, 0, 0x64, 0},
+    {EDIT_CreateIndirect, "RSpeed", ID_EDIT_1, 370, 360, 80, 40, 0, 0x64, 0},
     {BUTTON_CreateIndirect, "RStop", ID_BUTTON_6, 190, 285, 80, 40, 0, 0x0, 0},
-    {EDIT_CreateIndirect, "Edit", ID_EDIT_2, 225, 500, 80, 40, 0, 0x64, 0},
-    {TEXT_CreateIndirect, "SampleData:", ID_TEXT_2, 135, 500, 80, 40, 0, 0x64, 0},
+    {EDIT_CreateIndirect, "SampleEdit", ID_EDIT_2, 195, 545, 80, 40, 0, 0x64, 0},
+    {TEXT_CreateIndirect, "SampleData:", ID_TEXT_2, 110, 545, 80, 40, 0, 0x64, 0},
     // USER START (Optionally insert additional widgets)
+    {TEXT_CreateIndirect, "LeftRealSpeed", ID_TEXT_3, 105, 440, 80, 40, 0, 0x64, 0},
+    {TEXT_CreateIndirect, "RightRealSpeed", ID_TEXT_4, 285, 440, 80, 40, 0, 0x64, 0},
+    {EDIT_CreateIndirect, "LRsp", ID_EDIT_3, 105, 485, 80, 40, 0, 0x64, 0},
+    {EDIT_CreateIndirect, "RRsp", ID_EDIT_4, 285, 485, 80, 40, 0, 0x64, 0},
     // USER END
 };
 
@@ -90,7 +103,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
  *
  **********************************************************************
  */
-extern WM_HWIN PageItem;
+// TODO extern WM_HWIN PageItem;
+
 // USER START (Optionally insert additional static code)
 // USER END
 
@@ -104,6 +118,8 @@ static void _cbDialog(WM_MESSAGE *pMsg)
   int NCode;
   int Id;
   // USER START (Optionally insert additional variables)
+  int v;
+  char str[6];
   // USER END
 
   switch (pMsg->MsgId)
@@ -132,7 +148,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'LSpeed'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-    EDIT_SetText(hItem, "123");
+    EDIT_SetText(hItem, "500");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     //
@@ -145,8 +161,17 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'LStop'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
+    LeftStopItem = hItem;
     BUTTON_SetFont(hItem, FontMenuMSBlack24);
-    BUTTON_SetText(hItem, "左停止");
+    if (MotorConfig.real_left_speed)
+    {
+      BUTTON_SetText(hItem, "左停止");
+    }
+    else
+    {
+      BUTTON_SetText(hItem, "左开始");
+    }
+
     //
     // Initialization of 'R_Motor'
     //
@@ -167,33 +192,70 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     BUTTON_SetFont(hItem, FontMenuSong24);
     BUTTON_SetText(hItem, "▼");
     //
-    // Initialization of 'Edit'
+    // Initialization of 'RSpeed'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
-    EDIT_SetText(hItem, "123");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetText(hItem, "500");
     //
     // Initialization of 'RStop'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_6);
+    RightStopItem = hItem;
     BUTTON_SetFont(hItem, FontMenuMSBlack24);
-    BUTTON_SetText(hItem, "右停止");
+    if (MotorConfig.real_right_speed)
+    {
+      BUTTON_SetText(hItem, "右停止");
+    }
+    else
+    {
+      BUTTON_SetText(hItem, "右开始");
+    }
+
     //
     // Initialization of 'Edit'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
-    EDIT_SetText(hItem, "123");
-    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    EDIT_SetFont(hItem, FontMenuMSBlack24);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetText(hItem, "霸");
     //
     // Initialization of 'SampleData:'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
     TEXT_SetFont(hItem, FontMenuMSBlack24);
     TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-    TEXT_SetText(hItem, "转速");
-    // USER START (Optionally insert additional code for further widget initialization)
+    TEXT_SetText(hItem, "采样");
+    //! USER START (Optionally insert additional code for further widget initialization)
+    //
+    // Initialization of 'LeftRealSpeed'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
+    TEXT_SetFont(hItem, FontMenuMSBlack24);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetText(hItem, "左转速");
+    //
+    // Initialization of 'RightRealSpeed'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_4);
+    TEXT_SetFont(hItem, FontMenuMSBlack24);
+    TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    TEXT_SetText(hItem, "右转速");
+    //
+    // Initialization of 'LRSp'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetText(hItem, "0");
+    //
+    // Initialization of 'RRSp'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
+    EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+    EDIT_SetText(hItem, "0");
     // USER END
     break;
   case WM_NOTIFY_PARENT:
@@ -211,7 +273,12 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_RELEASED:
       {
         //! Change the manual control page between Dual/Single Motor
-        MULTIPAGE_AttachWindow(PageItem, 0, Createdual_motor());
+
+        // MULTIPAGE_AttachWindow(PageItem, 0, Createdual_motor());
+
+        WM_ShowWindow(DualMotorWIN);
+        WM_HideWindow(SingleMotorWIN);
+        // WM_DeleteWindow(SingleMotorWIN);
       }
       break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -231,6 +298,18 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_VALUE_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
+        // TODO 先做清楚启动/停止的逻辑关系！
+        /* hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        v = SLIDER_GetValue(hItem);
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+        EDIT_SetText(hItem, Int2String(v, str));
+        //TODO mode无用了？
+        ChangeSpeed(&MotorConfig, (u16)v);
+        if (MotorConfig.enable)
+        {
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+          EDIT_SetText(hItem, Int2String(v, str));
+        } */
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -295,6 +374,27 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
+        if (MotorConfig.real_left_speed)
+        {
+          MotorConfig.real_left_speed = 0;
+          BUTTON_SetText(hItem, "左开始");
+        }
+        else
+        {
+          MotorConfig.real_left_speed = MotorConfig.set_left_speed;
+          BUTTON_SetText(hItem, "左停止");
+        }
+        if (MotorConfig.real_left_speed || MotorConfig.real_right_speed)
+        {
+          MotorConfig.enable = 1;
+          BUTTON_SetText(StartItem, "停止");
+        }
+        else
+        {
+          MotorConfig.enable = 0;
+          BUTTON_SetText(StartItem, "开始");
+        }
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -350,7 +450,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER END
       }
       break;
-    case ID_EDIT_1: // Notifications sent by 'Edit'
+    case ID_EDIT_1: // Notifications sent by 'RSpeed'
       switch (NCode)
       {
       case WM_NOTIFICATION_CLICKED:
@@ -378,13 +478,35 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_6);
+        if (MotorConfig.real_right_speed)
+        {
+          MotorConfig.real_right_speed = 0;
+          BUTTON_SetText(hItem, "右开始");
+        }
+        else
+        {
+          MotorConfig.real_right_speed = MotorConfig.set_right_speed;
+          BUTTON_SetText(hItem, "右停止");
+        }
+        if (MotorConfig.real_left_speed || MotorConfig.real_right_speed)
+        {
+          MotorConfig.enable = 1;
+          BUTTON_SetText(StartItem, "停止");
+        }
+        else
+        {
+          MotorConfig.enable = 0;
+          BUTTON_SetText(StartItem, "开始");
+        }
+
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
         // USER END
       }
       break;
-    case ID_EDIT_2: // Notifications sent by 'Edit'
+    case ID_EDIT_2: // Notifications sent by 'SampleEdit'
       switch (NCode)
       {
       case WM_NOTIFICATION_CLICKED:
@@ -431,6 +553,7 @@ WM_HWIN Createsingle_motor(void)
   WM_HWIN hWin;
 
   hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
+  SingleMotorWIN = hWin;
   return hWin;
 }
 

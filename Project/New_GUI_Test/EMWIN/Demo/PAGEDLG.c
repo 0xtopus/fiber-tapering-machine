@@ -48,7 +48,8 @@
  *
  **********************************************************************
  */
-WM_HWIN PageItem;
+// TODO WM_HWIN PageItem;
+GUI_HWIN StartItem;
 
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontFontMenu24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
@@ -57,6 +58,9 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 extern WM_HWIN DualDirectionItem;
 extern WM_HWIN EditLeftRealSpeed;
 extern WM_HWIN EditRightRealSpeed;
+
+extern GUI_HWIN LeftStopItem;
+extern GUI_HWIN RightStopItem;
 
 /*********************************************************************
  *
@@ -115,7 +119,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'Multipage'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_MULTIPAGE_0);
-    PageItem = hItem;
+    // PageItem = hItem;
     MULTIPAGE_SetTabHeight(hItem, 30);
     MULTIPAGE_SetFont(hItem, FontMenuMSBlack24);
     MULTIPAGE_AddEmptyPage(hItem, 0, "手动");
@@ -131,6 +135,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'PWM_Ctrl'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
+    StartItem = hItem;
     BUTTON_SetFont(hItem, FontMenuMSBlack24);
     BUTTON_SetText(hItem, "开始");
     //
@@ -186,6 +191,8 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           {
             BUTTON_SetFont(hItem, FontMenuMSBlack24);
             BUTTON_SetText(hItem, "开始");
+            BUTTON_SetText(LeftStopItem, "左开始");
+            BUTTON_SetText(RightStopItem, "右开始");
             Motor_Stop(&MotorConfig);
             EDIT_SetText(EditLeftRealSpeed, "0");
             EDIT_SetText(EditRightRealSpeed, "0");
@@ -194,20 +201,21 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           {
             BUTTON_SetFont(hItem, FontMenuMSBlack24);
             BUTTON_SetText(hItem, "停止");
+            BUTTON_SetText(LeftStopItem, "左停止");
+            BUTTON_SetText(RightStopItem, "右停止");
             Motor_Start(&MotorConfig);
             if (MotorConfig.real_left_speed) // If real right speed is not zero
             {
-              EDIT_SetText(EditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed+5500), str));
+              EDIT_SetText(EditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed + 5500), str));
             }
             if (MotorConfig.real_right_speed) // If real right speed is not zero
             {
-              EDIT_SetText(EditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed+5500), str));
+              EDIT_SetText(EditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed + 5500), str));
             }
-            
           }
           // TODO
-          //printf("\r\nsstartpressed\r\n");
-          //printf("\r\n%u\r\n", MotorConfig.direction);
+          // printf("\r\nsstartpressed\r\n");
+          // printf("\r\n%u\r\n", MotorConfig.direction);
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)

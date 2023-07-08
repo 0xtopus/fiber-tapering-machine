@@ -18,6 +18,7 @@ typedef struct
     u16 real_left_speed;    // Realtime Left motor speed (reload value of timer), unless it is 0 which means stop
     u16 real_right_speed;   // Realtime Right motor speed (reload value of timer), unless it is 0 which means stop
     u8 direction;    // 0: Get closer; 1: Go reversely
+    //u16 dual_motor_speed;   // Used for remembering the set dual motor speed when switch mode
     u8 enable;       // 0: Disable; 1: Enable
 } MotorControlStruct;
 

@@ -59,6 +59,8 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 extern WM_HWIN PageItem;
 
 WM_HWIN DualDirectionItem;
+WM_HWIN EditLeftRealSpeed;
+WM_HWIN EditRightRealSpeed;
 
 /*********************************************************************
  *
@@ -202,6 +204,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     //! Initialization of "LRsp"
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+    EditLeftRealSpeed = hItem;
     EDIT_SetText(hItem, "0");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
@@ -209,6 +212,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     //! Initialization of "RRsp"
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+    EditRightRealSpeed = hItem;
     EDIT_SetText(hItem, "0");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
@@ -232,12 +236,21 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_VALUE_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
+        //TODO: is editItem really useful?
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         v = SLIDER_GetValue(hItem);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
         EDIT_SetText(editItem, Int2String(v, str));
         ChangeSpeed(&MotorConfig, (u16)v);
+        if (MotorConfig.enable) 
+        {
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+          EDIT_SetText(hItem, Int2String(v, str));
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+          EDIT_SetText(hItem, Int2String(v, str));
+        }
         
+
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -262,11 +275,27 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           ChangeSpeed(&MotorConfig, (u16)v + 100);
           EDIT_SetText(editItem, Int2String(v + 100, str));
           SLIDER_SetValue(hItem, v + 100);
+
+          if (MotorConfig.enable) 
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+            EDIT_SetText(hItem, Int2String(v, str));
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, Int2String(v, str));
+          }
         } else {
           // Set to maximum speed if the upper limit is reached
           ChangeSpeed(&MotorConfig, 5000);
           EDIT_SetText(editItem, "5000");
           SLIDER_SetValue(hItem, 5000);
+
+          if (MotorConfig.enable) 
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+            EDIT_SetText(hItem, "5000");
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, "5000");
+          }
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -290,11 +319,27 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           ChangeSpeed(&MotorConfig, (u16)v - 100);
           EDIT_SetText(editItem, Int2String(v - 100, str));
           SLIDER_SetValue(hItem, v - 100);
+          
+          if (MotorConfig.enable) 
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+            EDIT_SetText(hItem, Int2String(v, str));
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, Int2String(v, str));
+          }
         } else {
           // Set to maximum speed if the upper limit is reached
           ChangeSpeed(&MotorConfig, 500);
           EDIT_SetText(editItem, "500");
           SLIDER_SetValue(hItem, 500);
+
+          if (MotorConfig.enable) 
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
+            EDIT_SetText(hItem, "500");
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, "500");
+          }          
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)

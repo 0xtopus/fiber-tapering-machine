@@ -55,6 +55,9 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 
 extern WM_HWIN DualDirectionItem;
+extern WM_HWIN EditLeftRealSpeed;
+extern WM_HWIN EditRightRealSpeed;
+
 /*********************************************************************
  *
  *       Static data
@@ -95,6 +98,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
   int NCode;
   int Id;
   // USER START (Optionally insert additional variables)
+  char str[6];
   // USER END
 
   switch (pMsg->MsgId)
@@ -183,12 +187,23 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             BUTTON_SetFont(hItem, FontMenuMSBlack24);
             BUTTON_SetText(hItem, "开始");
             Motor_Stop(&MotorConfig);
+            EDIT_SetText(EditLeftRealSpeed, "0");
+            EDIT_SetText(EditRightRealSpeed, "0");
           }
           else
           {
             BUTTON_SetFont(hItem, FontMenuMSBlack24);
             BUTTON_SetText(hItem, "停止");
             Motor_Start(&MotorConfig);
+            if (MotorConfig.real_left_speed) // If real right speed is not zero
+            {
+              EDIT_SetText(EditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed+5500), str));
+            }
+            if (MotorConfig.real_right_speed) // If real right speed is not zero
+            {
+              EDIT_SetText(EditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed+5500), str));
+            }
+            
           }
           // TODO
           //printf("\r\nsstartpressed\r\n");

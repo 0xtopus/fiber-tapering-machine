@@ -30,7 +30,7 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
                 TIM5_PWM_Init(pMotorConfig->set_right_speed - 1, 108 - 1, GET_AWAY);
                 TIM2_PWM_Init(pMotorConfig->set_left_speed - 1, 108 - 1, GET_AWAY);
                 //! The frequency of timer is 108M/108=1M,
-                //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
+                //! if reload value = 1000, then PWM frequency is 1M/1000=1kHZ
                 //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
             else // Get closer
@@ -55,6 +55,7 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
                 TIM2_PWM_Init(reload_value, 108 - 1, GET_AWAY); //! The frequency of timer is 108M/108=1M,
                                                                 //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                 //! So the range of PWM frequency is 200Hz ~ 2kHz
+
             }
             else // Get closer
             {
@@ -87,6 +88,8 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
     }
 
     pMotorConfig->enable = 1;
+    pMotorConfig->real_left_speed = pMotorConfig->set_left_speed;
+    pMotorConfig->real_right_speed = pMotorConfig->set_right_speed;
     // Flash green LED
     LED1(0);
     LED0(1);
@@ -158,6 +161,8 @@ u8 Motor_Stop(MotorControlStruct *pMotorConfig)
     LED1(1);
     LED0(0);
     pMotorConfig->enable = 0;
+    pMotorConfig->real_left_speed = 0;
+    pMotorConfig->real_right_speed = 0;
     return pMotorConfig->mode;
 }
 

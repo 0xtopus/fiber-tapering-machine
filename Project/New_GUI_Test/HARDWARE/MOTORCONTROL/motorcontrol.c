@@ -41,7 +41,8 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
                 //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                 //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
-
+            pMotorConfig->real_left_speed = pMotorConfig->set_left_speed;
+            pMotorConfig->real_right_speed = pMotorConfig->set_right_speed;
             break;
         }
     case 1:
@@ -62,6 +63,7 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
                                                                   //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                   //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
+            pMotorConfig->real_left_speed = pMotorConfig->set_left_speed;
             break;
         }
     case 2:
@@ -82,13 +84,13 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
                                                                   //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                   //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
+            pMotorConfig->real_right_speed = pMotorConfig->set_right_speed;
             break;
         }
     }
 
     pMotorConfig->enable = 1;
-    pMotorConfig->real_left_speed = pMotorConfig->set_left_speed;
-    pMotorConfig->real_right_speed = pMotorConfig->set_right_speed;
+    
     // Flash green LED
     LED1(0);
     LED0(1);
@@ -116,16 +118,14 @@ u8 Motor_Stop(MotorControlStruct *pMotorConfig)
             {
                 HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_1);
                 HAL_TIM_PWM_Stop(&TIM5_Handler, TIM_CHANNEL_1);
-                pMotorConfig->real_left_speed = 0;
-                pMotorConfig->real_right_speed = 0;
             }
             else
             {
                 HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_2);
                 HAL_TIM_PWM_Stop(&TIM5_Handler, TIM_CHANNEL_2);
-                pMotorConfig->real_left_speed = 0;
-                pMotorConfig->real_right_speed = 0;
             }
+            pMotorConfig->real_left_speed = 0;
+            pMotorConfig->real_right_speed = 0;
             break;
         }
     case 1:
@@ -134,13 +134,12 @@ u8 Motor_Stop(MotorControlStruct *pMotorConfig)
             if (pMotorConfig->direction)
             {
                 HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_1);
-                // printf("ahahah\r\n");
             }
             else
             {
                 HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_2);
-                // printf("bbbbbbb\r\n");
             }
+            pMotorConfig->real_left_speed = 0;
             break;
         }
     case 2:
@@ -149,13 +148,12 @@ u8 Motor_Stop(MotorControlStruct *pMotorConfig)
             if (pMotorConfig->direction)
             {
                 HAL_TIM_PWM_Stop(&TIM5_Handler, TIM_CHANNEL_1);
-                // printf("ahahah\r\n");
             }
             else
             {
                 HAL_TIM_PWM_Stop(&TIM5_Handler, TIM_CHANNEL_2);
-                // printf("bbbbbbb\r\n");
             }
+            pMotorConfig->real_right_speed = 0;
             break;
         }
     }
@@ -283,12 +281,79 @@ u8 StopSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor) {
         } else {
             HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_2);
         }
-        pMotorConfig->real_right_speed = 0;
+        pMotorConfig->real_left_speed = 0;
         
     }
+    
     // TODO 先不考虑mode
+    if (pMotorConfig->real_left_speed && !pMotorConfig->real_right_speed)
+    {
+        pMotorConfig->mode = 1;    
+    }
+    else if (!pMotorConfig->real_left_speed && pMotorConfig->real_right_speed)
+    {
+        pMotorConfig->mode = 2;
+    } 
+    else if (!pMotorConfig->real_left_speed && !pMotorConfig->real_right_speed)
+    {
+        pMotorConfig->mode = 0;
+    }
+
     return pMotorConfig->mode;
 }
+
+/**
+ * Start the specific motor. 0 means left motor, 1 means right motor.
+ * @param pMotorConfig
+ * @param the_given_motor 
+ * @return The latest mode after the motor stopped.
+*/
+u8 StartSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor) {
+    // Right motor starts to run
+    if (the_given_motor && !pMotorConfig->real_right_speed)
+    {
+        if (pMotorConfig->direction)
+        {
+            TIM5_PWM_Init(pMotorConfig->set_right_speed - 1, 108 - 1, GET_AWAY);
+        } 
+        else 
+        {
+            TIM5_PWM_Init(pMotorConfig->set_right_speed - 1, 108 - 1, GET_CLOSER);
+        }
+        pMotorConfig->real_right_speed = pMotorConfig->set_right_speed;
+    }
+    // Left motor starts to run
+    if (!the_given_motor && !pMotorConfig->real_left_speed)
+    {
+        if (pMotorConfig->direction)
+        {
+            TIM2_PWM_Init(pMotorConfig->set_left_speed - 1, 108 - 1, GET_AWAY);
+        } 
+        else 
+        {
+            TIM2_PWM_Init(pMotorConfig->set_left_speed - 1, 108 - 1, GET_CLOSER);
+        }
+        pMotorConfig->real_left_speed = pMotorConfig->set_left_speed;
+    }
+    
+    // TODO 先不考虑mode
+    if (pMotorConfig->real_left_speed && !pMotorConfig->real_right_speed)
+    {
+        pMotorConfig->mode = 1;    
+    }
+    else if (!pMotorConfig->real_left_speed && pMotorConfig->real_right_speed)
+    {
+        pMotorConfig->mode = 2;
+    } 
+    else if (pMotorConfig->real_left_speed && pMotorConfig->real_right_speed)
+    {
+        pMotorConfig->mode = 0;
+    }
+    
+    return pMotorConfig->mode;
+}
+
+
 
 /**
  * Integer(positive decimal) to String

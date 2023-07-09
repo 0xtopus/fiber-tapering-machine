@@ -76,12 +76,12 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
     {WINDOW_CreateIndirect, "single_motor", ID_WINDOW_0, 5, 45, 470, 675, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "ChangeMode", ID_BUTTON_0, 185, 600, 100, 60, 0, 0x0, 0},
     {TEXT_CreateIndirect, "L_Motor", ID_TEXT_0, 10, 165, 80, 40, 0, 0x0, 0},
-    {SLIDER_CreateIndirect, "Slider", ID_SLIDER_0, 100, 155, 250, 70, 0, 0x0, 0},
+    {SLIDER_CreateIndirect, "LSlider", ID_SLIDER_0, 100, 155, 250, 70, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "LUP", ID_BUTTON_1, 370, 115, 80, 40, 0, 0x0, 0},
     {EDIT_CreateIndirect, "LSpeed", ID_EDIT_0, 370, 165, 80, 40, 0, 0x64, 0},
     {BUTTON_CreateIndirect, "LDown", ID_BUTTON_2, 370, 215, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "LStop", ID_BUTTON_3, 190, 90, 80, 40, 0, 0x0, 0},
-    {SLIDER_CreateIndirect, "Slider", ID_SLIDER_1, 100, 350, 250, 70, 0, 0x0, 0},
+    {SLIDER_CreateIndirect, "RSlider", ID_SLIDER_1, 100, 350, 250, 70, 0, 0x0, 0},
     {TEXT_CreateIndirect, "R_Motor", ID_TEXT_1, 10, 360, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "RUP", ID_BUTTON_4, 370, 310, 80, 40, 0, 0x0, 0},
     {BUTTON_CreateIndirect, "RDown", ID_BUTTON_5, 370, 410, 80, 40, 0, 0x0, 0},
@@ -125,6 +125,18 @@ static void _cbDialog(WM_MESSAGE *pMsg)
   switch (pMsg->MsgId)
   {
   case WM_INIT_DIALOG:
+    //
+    // Initialization of 'LSlider'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+    SLIDER_SetRange(hItem, 500, 5000);
+    SLIDER_SetValue(hItem, 500);
+    //
+    // Initialization of 'RSlider'
+    //
+    hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
+    SLIDER_SetRange(hItem, 500, 5000);
+    SLIDER_SetValue(hItem, 500);
     //
     // Initialization of 'ChangeMode'
     //
@@ -285,7 +297,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER END
       }
       break;
-    case ID_SLIDER_0: // Notifications sent by 'Slider'
+    case ID_SLIDER_0: // Notifications sent by 'LSlider'
       switch (NCode)
       {
       case WM_NOTIFICATION_CLICKED:
@@ -299,17 +311,17 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_VALUE_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
         // TODO 先做清楚启动/停止的逻辑关系！
-        /* hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         v = SLIDER_GetValue(hItem);
         hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
         EDIT_SetText(hItem, Int2String(v, str));
         //TODO mode无用了？
-        ChangeSpeed(&MotorConfig, (u16)v);
-        if (MotorConfig.enable)
+        //ChangeSpeed(&MotorConfig, (u16)v);
+        if (MotorConfig.real_left_speed)
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
           EDIT_SetText(hItem, Int2String(v, str));
-        } */
+        } 
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -377,14 +389,18 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
         if (MotorConfig.real_left_speed)
         {
-          MotorConfig.real_left_speed = 0;
+          //MotorConfig.real_left_speed = 0;
+          StopSpecificMotor(&MotorConfig, 0);
           BUTTON_SetText(hItem, "左开始");
         }
         else
         {
-          MotorConfig.real_left_speed = MotorConfig.set_left_speed;
+          //MotorConfig.real_left_speed = MotorConfig.set_left_speed;
+          StartSpecificMotor(&MotorConfig, 0);
           BUTTON_SetText(hItem, "左停止");
         }
+
+        // Update the Start button
         if (MotorConfig.real_left_speed || MotorConfig.real_right_speed)
         {
           MotorConfig.enable = 1;
@@ -401,7 +417,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER END
       }
       break;
-    case ID_SLIDER_1: // Notifications sent by 'Slider'
+    case ID_SLIDER_1: // Notifications sent by 'RSlider'
       switch (NCode)
       {
       case WM_NOTIFICATION_CLICKED:
@@ -414,6 +430,17 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_VALUE_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
+        v = SLIDER_GetValue(hItem);
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
+        EDIT_SetText(hItem, Int2String(v, str));
+        //TODO mode无用了？
+        //ChangeSpeed(&MotorConfig, (u16)v);
+        if (MotorConfig.real_right_speed)
+        {
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+          EDIT_SetText(hItem, Int2String(v, str));
+        }         
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -481,14 +508,18 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_6);
         if (MotorConfig.real_right_speed)
         {
-          MotorConfig.real_right_speed = 0;
+          //MotorConfig.real_right_speed = 0;
+          StopSpecificMotor(&MotorConfig, 1);
           BUTTON_SetText(hItem, "右开始");
         }
         else
         {
-          MotorConfig.real_right_speed = MotorConfig.set_right_speed;
+          //MotorConfig.real_right_speed = MotorConfig.set_right_speed;
+          StartSpecificMotor(&MotorConfig, 1);
           BUTTON_SetText(hItem, "右停止");
         }
+
+        // Update the Start button
         if (MotorConfig.real_left_speed || MotorConfig.real_right_speed)
         {
           MotorConfig.enable = 1;

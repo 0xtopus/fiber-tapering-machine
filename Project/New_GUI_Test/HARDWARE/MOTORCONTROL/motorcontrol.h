@@ -29,6 +29,8 @@ u8 Motor_Stop(MotorControlStruct* MotorConfig);
 u8 ChangeDirection(MotorControlStruct *pMotorConfig);
 u16 ChangeSpeed(MotorControlStruct *pMotorConfig, u16 set_value);
 u16 UpdateRealSpeed(MotorControlStruct *pMotorConfig, u16 new_speed);
+u8 StopSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor);
+u8 StartSpecificMotor(MotorControlStruct * pMotorConfig, u8 the_given_motor);
 char* Int2String(int num,char *str);
 int String2Int(char *str);
 

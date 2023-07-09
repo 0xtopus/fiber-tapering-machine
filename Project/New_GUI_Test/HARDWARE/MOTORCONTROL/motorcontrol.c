@@ -11,7 +11,6 @@ MotorControlStruct MotorConfig = {0, 5000, 5000, 0, 0, 0, 0};
  */
 u8 Motor_Start(MotorControlStruct *pMotorConfig)
 {
-    u16 reload_value;
 
     if (pMotorConfig->enable)
     {
@@ -23,8 +22,6 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
     case 0:
         // Both motors start working
         {
-            // TODO reload value
-            reload_value = 1000;
             if (pMotorConfig->direction) // Go reversely
             {
                 TIM5_PWM_Init(pMotorConfig->set_right_speed - 1, 108 - 1, GET_AWAY);
@@ -48,18 +45,15 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
     case 1:
         // Only left motor starts working
         {
-            // TODO speedÉèÖÃ
-            //! The range of reload_value: 500 ~ 5000
-            reload_value = -(pMotorConfig->set_left_speed) + 5500;
             if (pMotorConfig->direction) // Go reversely
             {
-                TIM2_PWM_Init(reload_value, 108 - 1, GET_AWAY); //! The frequency of timer is 108M/108=1M,
+                TIM2_PWM_Init(pMotorConfig->set_left_speed - 1, 108 - 1, GET_AWAY); //! The frequency of timer is 108M/108=1M,
                                                                 //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                 //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
             else // Get closer
             {
-                TIM2_PWM_Init(reload_value, 108 - 1, GET_CLOSER); //! The frequency of timer is 108M/108=1M,
+                TIM2_PWM_Init(pMotorConfig->set_left_speed - 1, 108 - 1, GET_CLOSER); //! The frequency of timer is 108M/108=1M,
                                                                   //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                   //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
@@ -70,17 +64,16 @@ u8 Motor_Start(MotorControlStruct *pMotorConfig)
         // Only right motor starts working
         {
             // TODO speedÉèÖÃ
-            //! The range of reload_value: 500 ~ 5000
-            reload_value = -(pMotorConfig->set_left_speed) + 5500;
+            printf("\r\nhehe\r\n");
             if (pMotorConfig->direction) // Go reversely
             {
-                TIM5_PWM_Init(reload_value, 108 - 1, GET_AWAY); //! The frequency of timer is 108M/108=1M,
+                TIM5_PWM_Init(pMotorConfig->set_right_speed - 1, 108 - 1, GET_AWAY); //! The frequency of timer is 108M/108=1M,
                                                                 //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                 //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
             else // Get closer
             {
-                TIM5_PWM_Init(reload_value, 108 - 1, GET_CLOSER); //! The frequency of timer is 108M/108=1M,
+                TIM5_PWM_Init(pMotorConfig->set_right_speed - 1, 108 - 1, GET_CLOSER); //! The frequency of timer is 108M/108=1M,
                                                                   //! if reload_value = 1000, then PWM frequency is 1M/1000=1kHZ
                                                                   //! So the range of PWM frequency is 200Hz ~ 2kHz
             }
@@ -177,8 +170,11 @@ u8 ChangeDirection(MotorControlStruct *pMotorConfig)
     {
         // Reinit the Motorconfig
         Motor_Stop(pMotorConfig);
+        //TODO
+        printf("\r\nbefore dir change: %u \r\n", pMotorConfig->set_right_speed);
         pMotorConfig->direction = !pMotorConfig->direction;
         Motor_Start(pMotorConfig);
+        printf("\r\nAfter dir change: %u \r\n", pMotorConfig->set_right_speed);
     }
     else
     {
@@ -229,7 +225,7 @@ u16 ChangeSpeed(MotorControlStruct *pMotorConfig, u16 set_value)
 u16 UpdateRealSpeed(MotorControlStruct *pMotorConfig, u16 new_speed)
 {
     Motor_Stop(pMotorConfig);
-    // When new_speed == 0, stop the motor
+    // If new_speed == 0, stop the motor
     if (!new_speed)
     {
         return 0;
@@ -310,7 +306,7 @@ u8 StopSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor) {
 */
 u8 StartSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor) {
     // Right motor starts to run
-    if (the_given_motor && !pMotorConfig->real_right_speed)
+    if (the_given_motor == 1 && !pMotorConfig->real_right_speed)
     {
         if (pMotorConfig->direction)
         {
@@ -323,7 +319,7 @@ u8 StartSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor) {
         pMotorConfig->real_right_speed = pMotorConfig->set_right_speed;
     }
     // Left motor starts to run
-    if (!the_given_motor && !pMotorConfig->real_left_speed)
+    else if (the_given_motor == 0 && !pMotorConfig->real_left_speed)
     {
         if (pMotorConfig->direction)
         {
@@ -353,6 +349,43 @@ u8 StartSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor) {
     return pMotorConfig->mode;
 }
 
+u16 ChangeSpecificSpeed(MotorControlStruct *pMotorConfig, u16 set_value, u8 the_given_motor) {
+    u16 set_speed = - set_value + 5500;
+    // Change the right motor speed
+    if (the_given_motor)
+    {
+        pMotorConfig->set_right_speed = set_speed;
+        if (pMotorConfig->real_right_speed)
+        {
+            UpdateSpecificRealSpeed(pMotorConfig, set_speed, the_given_motor);
+        }
+        
+    }
+    // Change the left motor speed
+    else
+    {
+        pMotorConfig->set_left_speed = set_speed;
+        if (pMotorConfig->real_left_speed)
+        {
+            UpdateSpecificRealSpeed(pMotorConfig, set_speed, the_given_motor);
+        }
+        
+    }
+    return set_speed;
+}
+
+u16 UpdateSpecificRealSpeed(MotorControlStruct *pMotorConfig, u16 new_speed, u8 the_given_motor) {
+    StopSpecificMotor(pMotorConfig, the_given_motor);
+    // If new_speed == 0, stop the motor
+    if (!new_speed)
+    {
+        return 0;
+    }
+
+
+    StartSpecificMotor(pMotorConfig, the_given_motor);
+    return new_speed;
+}
 
 
 /**

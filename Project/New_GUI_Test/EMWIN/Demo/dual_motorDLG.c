@@ -58,11 +58,18 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 //extern WM_HWIN PageItem;
 extern WM_HWIN SingleMotorWIN;
+extern WM_HWIN SingleEditLeftRealSpeed;
+extern WM_HWIN SingleEditRightRealSpeed;
+extern WM_HWIN SliderLeftItem;
+extern WM_HWIN SliderRightItem;
+extern WM_HWIN SingleEditLeftSetSpeed;
+extern WM_HWIN SingleEditRightSetSpeed;
 
 WM_HWIN DualMotorWIN;
 WM_HWIN DualDirectionItem;
 WM_HWIN EditLeftRealSpeed;
 WM_HWIN EditRightRealSpeed;
+WM_HWIN SliderDualItem;
 
 /*********************************************************************
  *
@@ -171,6 +178,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     //! Initialization of 'Slider'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+    SliderDualItem = hItem;
     SLIDER_SetRange(hItem, 500, 5000);
     SLIDER_SetValue(hItem, 500);
     
@@ -284,9 +292,9 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           if (MotorConfig.enable) 
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
-            EDIT_SetText(hItem, Int2String(v, str));
+            EDIT_SetText(hItem, Int2String(v + 100, str));
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
-            EDIT_SetText(hItem, Int2String(v, str));
+            EDIT_SetText(hItem, Int2String(v + 100, str));
           }
         } else {
           // Set to maximum speed if the upper limit is reached
@@ -328,9 +336,9 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           if (MotorConfig.enable) 
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
-            EDIT_SetText(hItem, Int2String(v, str));
+            EDIT_SetText(hItem, Int2String(v - 100, str));
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
-            EDIT_SetText(hItem, Int2String(v, str));
+            EDIT_SetText(hItem, Int2String(v - 100, str));
           }
         } else {
           // Set to maximum speed if the upper limit is reached
@@ -403,6 +411,49 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         //MULTIPAGE_AttachWindow(PageItem, 0, Createsingle_motor());
         //WM_DeleteWindow(DualMotorWIN);
         // WM_HideWindow(pMsg->hWin);
+        if (MotorConfig.real_left_speed)
+        {
+          EDIT_SetText(SingleEditLeftRealSpeed, Int2String(-MotorConfig.real_left_speed + 5500, str));
+        }
+        else
+        {
+          EDIT_SetText(SingleEditLeftRealSpeed, "0");
+        }
+
+        if (MotorConfig.real_right_speed)
+        {
+          EDIT_SetText(SingleEditRightRealSpeed, Int2String(-MotorConfig.real_right_speed + 5500, str));
+        }
+        else
+        {
+          EDIT_SetText(SingleEditRightRealSpeed, "0");
+        }
+
+        // 
+        if (MotorConfig.real_left_speed == MotorConfig.real_right_speed 
+              && MotorConfig.set_left_speed == MotorConfig.real_left_speed
+              && MotorConfig.set_right_speed == MotorConfig.real_right_speed)
+        {
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+          v = SLIDER_GetValue(hItem);
+          SLIDER_SetValue(SliderLeftItem, v);
+          SLIDER_SetValue(SliderRightItem, v);
+          EDIT_SetText(SingleEditLeftSetSpeed, Int2String(v, str));
+          EDIT_SetText(SingleEditRightSetSpeed, Int2String(v, str));
+          // Restore the two set_speed when switch to Single Control Mode from Dual Control Mode
+          MotorConfig.set_left_speed = (u16)(-v + 5500);
+          MotorConfig.set_right_speed = (u16)(-v + 5500);
+        } 
+        else 
+        {
+          v = SLIDER_GetValue(SliderLeftItem);
+          MotorConfig.set_left_speed = -v + 5500;
+          v = SLIDER_GetValue(SliderRightItem);
+          MotorConfig.set_right_speed = -v + 5500;
+        }
+
+        
+        
         WM_HideWindow(DualMotorWIN);
         WM_ShowWindow(SingleMotorWIN);
         

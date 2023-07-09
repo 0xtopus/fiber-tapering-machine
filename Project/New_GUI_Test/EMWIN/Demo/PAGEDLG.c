@@ -62,6 +62,9 @@ extern WM_HWIN EditRightRealSpeed;
 extern GUI_HWIN LeftStopItem;
 extern GUI_HWIN RightStopItem;
 
+extern WM_HWIN SingleEditLeftRealSpeed;
+extern WM_HWIN SingleEditRightRealSpeed;
+
 /*********************************************************************
  *
  *       Static data
@@ -194,8 +197,14 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             BUTTON_SetText(LeftStopItem, "左开始");
             BUTTON_SetText(RightStopItem, "右开始");
             Motor_Stop(&MotorConfig);
+            
             EDIT_SetText(EditLeftRealSpeed, "0");
             EDIT_SetText(EditRightRealSpeed, "0");
+
+            EDIT_SetText(SingleEditLeftRealSpeed, "0");
+            EDIT_SetText(SingleEditRightRealSpeed, "0");
+
+            MotorConfig.mode = 0;
           }
           else
           {
@@ -207,10 +216,13 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             if (MotorConfig.real_left_speed) // If real right speed is not zero
             {
               EDIT_SetText(EditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed + 5500), str));
+              EDIT_SetText(SingleEditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed + 5500), str));
             }
             if (MotorConfig.real_right_speed) // If real right speed is not zero
             {
+              
               EDIT_SetText(EditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed + 5500), str));
+              EDIT_SetText(SingleEditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed + 5500), str));
             }
           }
           // TODO

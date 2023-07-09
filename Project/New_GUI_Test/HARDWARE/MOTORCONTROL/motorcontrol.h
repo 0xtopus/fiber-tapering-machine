@@ -20,6 +20,7 @@ typedef struct
     u8 direction;    // 0: Get closer; 1: Go reversely
     //u16 dual_motor_speed;   // Used for remembering the set dual motor speed when switch mode
     u8 enable;       // 0: Disable; 1: Enable
+    //u16 dual_set_speed; // When switch to Dual Control Mode from Single Control Mode, used this to restore the set_speed
 } MotorControlStruct;
 
 extern MotorControlStruct MotorConfig;
@@ -31,6 +32,9 @@ u16 ChangeSpeed(MotorControlStruct *pMotorConfig, u16 set_value);
 u16 UpdateRealSpeed(MotorControlStruct *pMotorConfig, u16 new_speed);
 u8 StopSpecificMotor(MotorControlStruct *pMotorConfig, u8 the_given_motor);
 u8 StartSpecificMotor(MotorControlStruct * pMotorConfig, u8 the_given_motor);
+u16 ChangeSpecificSpeed(MotorControlStruct *pMotorConfig, u16 set_value, u8 the_given_motor);
+u16 UpdateSpecificRealSpeed(MotorControlStruct *pMotorConfig, u16 new_speed, u8 the_given_motor);
+
 char* Int2String(int num,char *str);
 int String2Int(char *str);
 

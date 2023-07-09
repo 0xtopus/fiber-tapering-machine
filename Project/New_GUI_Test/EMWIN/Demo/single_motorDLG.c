@@ -52,6 +52,9 @@
 
 #define FontMenuSong24 &GUI_FontMenuSong24
 #define FontMenuMSBlack24 &GUI_FontMenuMSBlack24
+
+#define RIGHT_MOTOR 1
+#define LEFT_MOTOR  0
 /*********************************************************************
  *
  *       Static data
@@ -63,11 +66,22 @@ extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuSong24;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontMenuMSBlack24;
 
 extern GUI_HWIN DualMotorWIN;
-extern StartItem;
+extern WM_HWIN EditLeftRealSpeed;
+extern WM_HWIN EditRightRealSpeed;
+extern WM_HWIN SliderDualItem;
+extern GUI_HWIN StartItem;
 
 WM_HWIN SingleMotorWIN;
+WM_HWIN SingleEditLeftRealSpeed;
+WM_HWIN SingleEditRightRealSpeed;
+WM_HWIN SliderLeftItem;
+WM_HWIN SliderRightItem;
+WM_HWIN SingleEditLeftSetSpeed;
+WM_HWIN SingleEditRightSetSpeed;
+
 GUI_HWIN LeftStopItem;
 GUI_HWIN RightStopItem;
+
 /*********************************************************************
  *
  *       _aDialogCreate
@@ -118,6 +132,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
   int NCode;
   int Id;
   // USER START (Optionally insert additional variables)
+  WM_HWIN editItem;
   int v;
   char str[6];
   // USER END
@@ -129,12 +144,14 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'LSlider'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+    SliderLeftItem = hItem;
     SLIDER_SetRange(hItem, 500, 5000);
     SLIDER_SetValue(hItem, 500);
     //
     // Initialization of 'RSlider'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
+    SliderRightItem = hItem;
     SLIDER_SetRange(hItem, 500, 5000);
     SLIDER_SetValue(hItem, 500);
     //
@@ -160,6 +177,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'LSpeed'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+    SingleEditLeftSetSpeed = hItem;
     EDIT_SetText(hItem, "500");
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
@@ -207,6 +225,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'RSpeed'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
+    SingleEditRightSetSpeed = hItem;
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     EDIT_SetText(hItem, "500");
@@ -258,6 +277,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'LRSp'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+    SingleEditLeftRealSpeed = hItem;
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     EDIT_SetText(hItem, "0");
@@ -265,6 +285,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'RRSp'
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+    SingleEditRightRealSpeed = hItem;
     EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     EDIT_SetText(hItem, "0");
@@ -287,7 +308,31 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         //! Change the manual control page between Dual/Single Motor
 
         // MULTIPAGE_AttachWindow(PageItem, 0, Createdual_motor());
+        //TODO modemode stop
+        MotorConfig.mode = 0;
+        if (MotorConfig.real_left_speed)
+        {
+          EDIT_SetText(EditLeftRealSpeed, Int2String(-MotorConfig.real_left_speed + 5500, str));
+        }
+        else 
+        {
+          EDIT_SetText(EditLeftRealSpeed, "0");
+        }
 
+        if (MotorConfig.real_right_speed)
+        {
+          EDIT_SetText(EditRightRealSpeed, Int2String(-MotorConfig.real_right_speed + 5500, str));
+        }
+        else 
+        {
+          EDIT_SetText(EditRightRealSpeed, "0");
+        }
+
+        // Restore the two set_speed when switch to Dual Control Mode from Single Control Mode
+        v = SLIDER_GetValue(SliderDualItem);
+        MotorConfig.set_left_speed = (u16)(-v + 5500);
+        MotorConfig.set_right_speed = (u16)(-v + 5500);
+        
         WM_ShowWindow(DualMotorWIN);
         WM_HideWindow(SingleMotorWIN);
         // WM_DeleteWindow(SingleMotorWIN);
@@ -316,7 +361,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
         EDIT_SetText(hItem, Int2String(v, str));
         //TODO mode无用了？
-        //ChangeSpeed(&MotorConfig, (u16)v);
+        ChangeSpecificSpeed(&MotorConfig, (u16)v, LEFT_MOTOR);
         if (MotorConfig.real_left_speed)
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
@@ -337,6 +382,33 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+        if (MotorConfig.set_left_speed - 100 > 500)
+        {
+          EDIT_GetText(editItem, str, 5);
+          v = String2Int(str);
+          ChangeSpecificSpeed(&MotorConfig, (u16)v + 100, LEFT_MOTOR);
+          EDIT_SetText(editItem, Int2String(v + 100, str));
+          SLIDER_SetValue(hItem, v + 100);
+          if (MotorConfig.real_left_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, Int2String(v + 100, str));
+          }
+          
+        }
+        else
+        {
+          ChangeSpecificSpeed(&MotorConfig, 5000, LEFT_MOTOR);
+          EDIT_SetText(editItem, "5000");
+          SLIDER_SetValue(hItem, 5000);
+          if (MotorConfig.real_left_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, "5000");
+          }
+        }
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -371,6 +443,33 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
+        if (MotorConfig.set_left_speed + 100 < 5000)
+        {
+          EDIT_GetText(editItem, str, 5);
+          v = String2Int(str);
+          ChangeSpecificSpeed(&MotorConfig, (u16)v - 100, LEFT_MOTOR);
+          EDIT_SetText(editItem, Int2String(v - 100, str));
+          SLIDER_SetValue(hItem, v - 100);
+          if (MotorConfig.real_left_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, Int2String(v - 100, str));
+          }
+          
+        }
+        else
+        {
+          ChangeSpecificSpeed(&MotorConfig, 500, LEFT_MOTOR);
+          EDIT_SetText(editItem, "500");
+          SLIDER_SetValue(hItem, 500);
+          if (MotorConfig.real_left_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+            EDIT_SetText(hItem, "500");
+          }
+        }
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -392,12 +491,16 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           //MotorConfig.real_left_speed = 0;
           StopSpecificMotor(&MotorConfig, 0);
           BUTTON_SetText(hItem, "左开始");
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+          EDIT_SetText(hItem, "0");
         }
         else
         {
           //MotorConfig.real_left_speed = MotorConfig.set_left_speed;
           StartSpecificMotor(&MotorConfig, 0);
           BUTTON_SetText(hItem, "左停止");
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
+          EDIT_SetText(hItem, Int2String(-MotorConfig.real_left_speed+5500, str));
         }
 
         // Update the Start button
@@ -435,7 +538,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
         EDIT_SetText(hItem, Int2String(v, str));
         //TODO mode无用了？
-        //ChangeSpeed(&MotorConfig, (u16)v);
+        ChangeSpecificSpeed(&MotorConfig, (u16)v, RIGHT_MOTOR);
         if (MotorConfig.real_right_speed)
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
@@ -456,6 +559,35 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
+        if (MotorConfig.set_right_speed - 100 > 500)
+        {
+          EDIT_GetText(editItem, str, 5);
+          v = String2Int(str);
+          ChangeSpecificSpeed(&MotorConfig, (u16)v + 100, RIGHT_MOTOR);
+          EDIT_SetText(editItem, Int2String(v + 100, str));
+          SLIDER_SetValue(hItem, v + 100);
+          if (MotorConfig.real_right_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+            EDIT_SetText(hItem, Int2String(v + 100, str));
+          }
+          
+        }
+        else
+        {
+          ChangeSpecificSpeed(&MotorConfig, 5000, RIGHT_MOTOR);
+          EDIT_SetText(editItem, "5000");
+          SLIDER_SetValue(hItem, 5000);
+          if (MotorConfig.real_right_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+            EDIT_SetText(hItem, "5000");
+          }
+        }
+        
+
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -471,6 +603,34 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
+        hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
+        editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
+        if (MotorConfig.set_right_speed + 100 < 5000)
+        {
+          EDIT_GetText(editItem, str, 5);
+          v = String2Int(str);
+          ChangeSpecificSpeed(&MotorConfig, (u16)v - 100, RIGHT_MOTOR);
+          EDIT_SetText(editItem, Int2String(v - 100, str));
+          SLIDER_SetValue(hItem, v - 100);
+          if (MotorConfig.real_right_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+            EDIT_SetText(hItem, Int2String(v - 100, str));
+          }
+          
+        }
+        else
+        {
+          ChangeSpecificSpeed(&MotorConfig, 500, RIGHT_MOTOR);
+          EDIT_SetText(editItem, "500");
+          SLIDER_SetValue(hItem, 500);
+          if (MotorConfig.real_right_speed)
+          {
+            hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+            EDIT_SetText(hItem, "500");
+          }
+        }
+
         // USER END
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -511,12 +671,16 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           //MotorConfig.real_right_speed = 0;
           StopSpecificMotor(&MotorConfig, 1);
           BUTTON_SetText(hItem, "右开始");
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+          EDIT_SetText(hItem, "0");
         }
         else
         {
           //MotorConfig.real_right_speed = MotorConfig.set_right_speed;
           StartSpecificMotor(&MotorConfig, 1);
           BUTTON_SetText(hItem, "右停止");
+          hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
+          EDIT_SetText(hItem, Int2String(-MotorConfig.real_right_speed+5500, str));
         }
 
         // Update the Start button

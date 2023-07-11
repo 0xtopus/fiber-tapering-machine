@@ -71,6 +71,8 @@ WM_HWIN EditLeftRealSpeed;
 WM_HWIN EditRightRealSpeed;
 WM_HWIN SliderDualItem;
 
+extern GUI_HWIN LeftStopItem;
+extern GUI_HWIN RightStopItem;
 /*********************************************************************
  *
  *       Static data
@@ -254,14 +256,24 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         v = SLIDER_GetValue(hItem);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
         EDIT_SetText(editItem, Int2String(v, str));
-        ChangeSpeed(&MotorConfig, (u16)v);
-        if (MotorConfig.enable) 
+        //!ChangeSpeed(&MotorConfig, (u16)v);
+        ChangeSpecificSpeed((u16)v, LEFT_MOTOR);
+        ChangeSpecificSpeed((u16)v, RIGHT_MOTOR);
+        //! If there is only one motor operating when on the dual motors control page,
+        //! the slider will only be effective to the operating motor.
+        //! You can tap "Stop" button to stop and tap it again to boot both motors,
+        //! and then the slider is effective to both motors. 
+        if (GetMotorConfig(REAL_LEFT_SPEED)) 
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
           EDIT_SetText(hItem, Int2String(v, str));
+        }
+        if (GetMotorConfig(REAL_RIGHT_SPEED))
+        {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
           EDIT_SetText(hItem, Int2String(v, str));
         }
+        
         
 
         // USER END
@@ -281,34 +293,54 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-        if (MotorConfig.set_left_speed - 100 > 500 && MotorConfig.set_left_speed - 100 > 500)
+        if (GetMotorConfig(SET_RIGHT_SPEED) - 100 > 500 && GetMotorConfig(SET_LEFT_SPEED) - 100 > 500)
         {
           EDIT_GetText(editItem, str, 5);
           v = String2Int(str);
-          ChangeSpeed(&MotorConfig, (u16)v + 100);
+          //!ChangeSpeed(&MotorConfig, (u16)v + 100);
+          ChangeSpecificSpeed((u16)v + 100, LEFT_MOTOR);
+          ChangeSpecificSpeed((u16)v + 100, RIGHT_MOTOR);
           EDIT_SetText(editItem, Int2String(v + 100, str));
           SLIDER_SetValue(hItem, v + 100);
 
-          if (MotorConfig.enable) 
+          //! If there is only one motor operating when on the dual motors control page,
+          //! the button will only be effective to the operating motor.
+          //! You can tap "Stop" button to stop and tap it again to boot both motors,
+          //! and then the slider is effective to both motors. 
+          if (GetMotorConfig(REAL_LEFT_SPEED)) 
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
             EDIT_SetText(hItem, Int2String(v + 100, str));
+          }
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
+          {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, Int2String(v + 100, str));
           }
+          
         } else {
           // Set to maximum speed if the upper limit is reached
-          ChangeSpeed(&MotorConfig, 5000);
+          //!ChangeSpeed(&MotorConfig, 5000);
+          ChangeSpecificSpeed(5000, LEFT_MOTOR);
+          ChangeSpecificSpeed(5000, RIGHT_MOTOR);
           EDIT_SetText(editItem, "5000");
           SLIDER_SetValue(hItem, 5000);
 
-          if (MotorConfig.enable) 
+          //! If there is only one motor operating when on the dual motors control page,
+          //! the button will only be effective to the operating motor.
+          //! You can tap "Stop" button to stop and tap it again to boot both motors,
+          //! and then the slider is effective to both motors. 
+          if (GetMotorConfig(REAL_LEFT_SPEED)) 
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
             EDIT_SetText(hItem, "5000");
+          }
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
+          {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, "5000");
           }
+          
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -325,34 +357,53 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_RELEASED:
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-        if (MotorConfig.set_left_speed + 100 < 5000 && MotorConfig.set_left_speed + 100 < 5000)
+        if (GetMotorConfig(SET_RIGHT_SPEED) + 100 < 5000 && GetMotorConfig(SET_LEFT_SPEED) + 100 < 5000)
         {
           EDIT_GetText(editItem, str, 5);
           v = String2Int(str);
-          ChangeSpeed(&MotorConfig, (u16)v - 100);
+          //!ChangeSpeed(&MotorConfig, (u16)v - 100);
+          ChangeSpecificSpeed((u16)v - 100, LEFT_MOTOR);
+          ChangeSpecificSpeed((u16)v - 100, RIGHT_MOTOR);
           EDIT_SetText(editItem, Int2String(v - 100, str));
           SLIDER_SetValue(hItem, v - 100);
           
-          if (MotorConfig.enable) 
+          //! If there is only one motor operating when on the dual motors control page,
+          //! the button will only be effective to the operating motor.
+          //! You can tap "Stop" button to stop and tap it again to boot both motors,
+          //! and then the slider is effective to both motors. 
+          if (GetMotorConfig(REAL_LEFT_SPEED)) 
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
             EDIT_SetText(hItem, Int2String(v - 100, str));
+          }
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
+          {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, Int2String(v - 100, str));
           }
         } else {
           // Set to maximum speed if the upper limit is reached
-          ChangeSpeed(&MotorConfig, 500);
+          //!ChangeSpeed(&MotorConfig, 500);
+          ChangeSpecificSpeed(500, LEFT_MOTOR);
+          ChangeSpecificSpeed(500, RIGHT_MOTOR);
           EDIT_SetText(editItem, "500");
           SLIDER_SetValue(hItem, 500);
 
-          if (MotorConfig.enable) 
+          //! If there is only one motor operating when on the dual motors control page,
+          //! the button will only be effective to the operating motor.
+          //! You can tap "Stop" button to stop and tap it again to boot both motors,
+          //! and then the slider is effective to both motors. 
+          if (GetMotorConfig(REAL_LEFT_SPEED)) 
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
             EDIT_SetText(hItem, "500");
+          }          
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
+          {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, "500");
-          }          
+          }
+          
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -411,28 +462,33 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         //MULTIPAGE_AttachWindow(PageItem, 0, Createsingle_motor());
         //WM_DeleteWindow(DualMotorWIN);
         // WM_HideWindow(pMsg->hWin);
-        if (MotorConfig.real_left_speed)
+        if (GetMotorConfig(REAL_LEFT_SPEED))
         {
-          EDIT_SetText(SingleEditLeftRealSpeed, Int2String(-MotorConfig.real_left_speed + 5500, str));
+          EDIT_SetText(SingleEditLeftRealSpeed, Int2String(-GetMotorConfig(REAL_LEFT_SPEED) + 5500, str));
+          BUTTON_SetText(LeftStopItem,"左停止");
         }
         else
         {
           EDIT_SetText(SingleEditLeftRealSpeed, "0");
+          BUTTON_SetText(LeftStopItem,"左开始");
         }
 
-        if (MotorConfig.real_right_speed)
+        if (GetMotorConfig(REAL_RIGHT_SPEED))
         {
-          EDIT_SetText(SingleEditRightRealSpeed, Int2String(-MotorConfig.real_right_speed + 5500, str));
+          EDIT_SetText(SingleEditRightRealSpeed, Int2String(-GetMotorConfig(REAL_RIGHT_SPEED) + 5500, str));
+          BUTTON_SetText(RightStopItem,"右停止");
         }
         else
         {
           EDIT_SetText(SingleEditRightRealSpeed, "0");
+          BUTTON_SetText(RightStopItem,"右开始");
         }
 
-        // 
-        if (MotorConfig.real_left_speed == MotorConfig.real_right_speed 
-              && MotorConfig.set_left_speed == MotorConfig.real_left_speed
-              && MotorConfig.set_right_speed == MotorConfig.real_right_speed)
+        // Synchronize the set values in single motor mode if motors are running under dual motor mode
+        // So user can adjust the speed of each motor independently based on current realtime speed
+        if (GetMotorConfig(REAL_LEFT_SPEED) == GetMotorConfig(REAL_RIGHT_SPEED) 
+              && GetMotorConfig(SET_LEFT_SPEED) == GetMotorConfig(REAL_LEFT_SPEED)
+              && GetMotorConfig(SET_RIGHT_SPEED) == GetMotorConfig(REAL_RIGHT_SPEED))
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
           v = SLIDER_GetValue(hItem);
@@ -441,15 +497,15 @@ static void _cbDialog(WM_MESSAGE *pMsg)
           EDIT_SetText(SingleEditLeftSetSpeed, Int2String(v, str));
           EDIT_SetText(SingleEditRightSetSpeed, Int2String(v, str));
           // Restore the two set_speed when switch to Single Control Mode from Dual Control Mode
-          MotorConfig.set_left_speed = (u16)(-v + 5500);
-          MotorConfig.set_right_speed = (u16)(-v + 5500);
+          SetMotorConfig(SET_LEFT_SPEED, (u16)(-v + 5500));
+          SetMotorConfig(SET_RIGHT_SPEED, (u16)(-v + 5500));
         } 
         else 
         {
           v = SLIDER_GetValue(SliderLeftItem);
-          MotorConfig.set_left_speed = -v + 5500;
+          SetMotorConfig(SET_LEFT_SPEED, (u16)(-v + 5500));
           v = SLIDER_GetValue(SliderRightItem);
-          MotorConfig.set_right_speed = -v + 5500;
+          SetMotorConfig(SET_RIGHT_SPEED, (u16)(-v + 5500));
         }
 
         

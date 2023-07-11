@@ -53,8 +53,7 @@
 #define FontMenuSong24 &GUI_FontMenuSong24
 #define FontMenuMSBlack24 &GUI_FontMenuMSBlack24
 
-#define RIGHT_MOTOR 1
-#define LEFT_MOTOR  0
+
 /*********************************************************************
  *
  *       Static data
@@ -193,7 +192,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
     LeftStopItem = hItem;
     BUTTON_SetFont(hItem, FontMenuMSBlack24);
-    if (MotorConfig.real_left_speed)
+    if (GetMotorConfig(REAL_LEFT_SPEED))
     {
       BUTTON_SetText(hItem, "左停止");
     }
@@ -235,7 +234,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_6);
     RightStopItem = hItem;
     BUTTON_SetFont(hItem, FontMenuMSBlack24);
-    if (MotorConfig.real_right_speed)
+    if (GetMotorConfig(REAL_RIGHT_SPEED))
     {
       BUTTON_SetText(hItem, "右停止");
     }
@@ -308,20 +307,18 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         //! Change the manual control page between Dual/Single Motor
 
         // MULTIPAGE_AttachWindow(PageItem, 0, Createdual_motor());
-        //TODO modemode stop
-        MotorConfig.mode = 0;
-        if (MotorConfig.real_left_speed)
+        if (GetMotorConfig(REAL_LEFT_SPEED))
         {
-          EDIT_SetText(EditLeftRealSpeed, Int2String(-MotorConfig.real_left_speed + 5500, str));
+          EDIT_SetText(EditLeftRealSpeed, Int2String(-GetMotorConfig(REAL_LEFT_SPEED) + 5500, str));
         }
         else 
         {
           EDIT_SetText(EditLeftRealSpeed, "0");
         }
 
-        if (MotorConfig.real_right_speed)
+        if (GetMotorConfig(REAL_RIGHT_SPEED))
         {
-          EDIT_SetText(EditRightRealSpeed, Int2String(-MotorConfig.real_right_speed + 5500, str));
+          EDIT_SetText(EditRightRealSpeed, Int2String(-GetMotorConfig(REAL_RIGHT_SPEED) + 5500, str));
         }
         else 
         {
@@ -330,8 +327,8 @@ static void _cbDialog(WM_MESSAGE *pMsg)
 
         // Restore the two set_speed when switch to Dual Control Mode from Single Control Mode
         v = SLIDER_GetValue(SliderDualItem);
-        MotorConfig.set_left_speed = (u16)(-v + 5500);
-        MotorConfig.set_right_speed = (u16)(-v + 5500);
+        SetMotorConfig(SET_LEFT_SPEED, (u16)(-v + 5500));
+        SetMotorConfig(SET_RIGHT_SPEED, (u16)(-v + 5500));
         
         WM_ShowWindow(DualMotorWIN);
         WM_HideWindow(SingleMotorWIN);
@@ -355,14 +352,13 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         break;
       case WM_NOTIFICATION_VALUE_CHANGED:
         // USER START (Optionally insert code for reacting on notification message)
-        // TODO 先做清楚启动/停止的逻辑关系！
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         v = SLIDER_GetValue(hItem);
         hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
         EDIT_SetText(hItem, Int2String(v, str));
         //TODO mode无用了？
-        ChangeSpecificSpeed(&MotorConfig, (u16)v, LEFT_MOTOR);
-        if (MotorConfig.real_left_speed)
+        ChangeSpecificSpeed((u16)v, LEFT_MOTOR);
+        if (GetMotorConfig(REAL_LEFT_SPEED))
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
           EDIT_SetText(hItem, Int2String(v, str));
@@ -384,14 +380,15 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-        if (MotorConfig.set_left_speed - 100 > 500)
+        if (GetMotorConfig(SET_LEFT_SPEED) - 100 > 500)
         {
           EDIT_GetText(editItem, str, 5);
           v = String2Int(str);
-          ChangeSpecificSpeed(&MotorConfig, (u16)v + 100, LEFT_MOTOR);
+          ChangeSpecificSpeed((u16)v + 100, LEFT_MOTOR);
           EDIT_SetText(editItem, Int2String(v + 100, str));
           SLIDER_SetValue(hItem, v + 100);
-          if (MotorConfig.real_left_speed)
+          // If the left motor is operating, update the realtime speed display
+          if (GetMotorConfig(REAL_LEFT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, Int2String(v + 100, str));
@@ -400,10 +397,11 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         }
         else
         {
-          ChangeSpecificSpeed(&MotorConfig, 5000, LEFT_MOTOR);
+          ChangeSpecificSpeed(5000, LEFT_MOTOR);
           EDIT_SetText(editItem, "5000");
           SLIDER_SetValue(hItem, 5000);
-          if (MotorConfig.real_left_speed)
+          // If the left motor is operating, update the realtime speed display
+          if (GetMotorConfig(REAL_LEFT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, "5000");
@@ -445,14 +443,15 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_0);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_0);
-        if (MotorConfig.set_left_speed + 100 < 5000)
+        if (GetMotorConfig(SET_LEFT_SPEED) + 100 < 5000)
         {
           EDIT_GetText(editItem, str, 5);
           v = String2Int(str);
-          ChangeSpecificSpeed(&MotorConfig, (u16)v - 100, LEFT_MOTOR);
+          ChangeSpecificSpeed((u16)v - 100, LEFT_MOTOR);
           EDIT_SetText(editItem, Int2String(v - 100, str));
           SLIDER_SetValue(hItem, v - 100);
-          if (MotorConfig.real_left_speed)
+          // If the left motor is operating, update the realtime speed display
+          if (GetMotorConfig(REAL_LEFT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, Int2String(v - 100, str));
@@ -461,10 +460,11 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         }
         else
         {
-          ChangeSpecificSpeed(&MotorConfig, 500, LEFT_MOTOR);
+          ChangeSpecificSpeed(500, LEFT_MOTOR);
           EDIT_SetText(editItem, "500");
           SLIDER_SetValue(hItem, 500);
-          if (MotorConfig.real_left_speed)
+          // If the left motor is operating, update the realtime speed display
+          if (GetMotorConfig(REAL_LEFT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
             EDIT_SetText(hItem, "500");
@@ -486,32 +486,28 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_3);
-        if (MotorConfig.real_left_speed)
+        if (GetMotorConfig(REAL_LEFT_SPEED))
         {
-          //MotorConfig.real_left_speed = 0;
-          StopSpecificMotor(&MotorConfig, 0);
+          StopSpecificMotor(LEFT_MOTOR);
           BUTTON_SetText(hItem, "左开始");
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
           EDIT_SetText(hItem, "0");
         }
         else
         {
-          //MotorConfig.real_left_speed = MotorConfig.set_left_speed;
-          StartSpecificMotor(&MotorConfig, 0);
+          StartSpecificMotor(LEFT_MOTOR);
           BUTTON_SetText(hItem, "左停止");
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_3);
-          EDIT_SetText(hItem, Int2String(-MotorConfig.real_left_speed+5500, str));
+          EDIT_SetText(hItem, Int2String(-GetMotorConfig(REAL_LEFT_SPEED) + 5500, str));
         }
 
         // Update the Start button
-        if (MotorConfig.real_left_speed || MotorConfig.real_right_speed)
+        if (GetMotorConfig(REAL_LEFT_SPEED) || GetMotorConfig(REAL_RIGHT_SPEED))
         {
-          MotorConfig.enable = 1;
           BUTTON_SetText(StartItem, "停止");
         }
         else
         {
-          MotorConfig.enable = 0;
           BUTTON_SetText(StartItem, "开始");
         }
         // USER END
@@ -538,8 +534,8 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
         EDIT_SetText(hItem, Int2String(v, str));
         //TODO mode无用了？
-        ChangeSpecificSpeed(&MotorConfig, (u16)v, RIGHT_MOTOR);
-        if (MotorConfig.real_right_speed)
+        ChangeSpecificSpeed((u16)v, RIGHT_MOTOR);
+        if (GetMotorConfig(REAL_RIGHT_SPEED))
         {
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
           EDIT_SetText(hItem, Int2String(v, str));
@@ -561,14 +557,14 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
-        if (MotorConfig.set_right_speed - 100 > 500)
+        if (GetMotorConfig(SET_RIGHT_SPEED) - 100 > 500)
         {
           EDIT_GetText(editItem, str, 5);
           v = String2Int(str);
-          ChangeSpecificSpeed(&MotorConfig, (u16)v + 100, RIGHT_MOTOR);
+          ChangeSpecificSpeed((u16)v + 100, RIGHT_MOTOR);
           EDIT_SetText(editItem, Int2String(v + 100, str));
           SLIDER_SetValue(hItem, v + 100);
-          if (MotorConfig.real_right_speed)
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
             EDIT_SetText(hItem, Int2String(v + 100, str));
@@ -577,10 +573,10 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         }
         else
         {
-          ChangeSpecificSpeed(&MotorConfig, 5000, RIGHT_MOTOR);
+          ChangeSpecificSpeed(5000, RIGHT_MOTOR);
           EDIT_SetText(editItem, "5000");
           SLIDER_SetValue(hItem, 5000);
-          if (MotorConfig.real_right_speed)
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
             EDIT_SetText(hItem, "5000");
@@ -605,14 +601,14 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_SLIDER_1);
         editItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_1);
-        if (MotorConfig.set_right_speed + 100 < 5000)
+        if (GetMotorConfig(SET_RIGHT_SPEED) + 100 < 5000)
         {
           EDIT_GetText(editItem, str, 5);
           v = String2Int(str);
-          ChangeSpecificSpeed(&MotorConfig, (u16)v - 100, RIGHT_MOTOR);
+          ChangeSpecificSpeed((u16)v - 100, RIGHT_MOTOR);
           EDIT_SetText(editItem, Int2String(v - 100, str));
           SLIDER_SetValue(hItem, v - 100);
-          if (MotorConfig.real_right_speed)
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
             EDIT_SetText(hItem, Int2String(v - 100, str));
@@ -621,10 +617,10 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         }
         else
         {
-          ChangeSpecificSpeed(&MotorConfig, 500, RIGHT_MOTOR);
+          ChangeSpecificSpeed(500, RIGHT_MOTOR);
           EDIT_SetText(editItem, "500");
           SLIDER_SetValue(hItem, 500);
-          if (MotorConfig.real_right_speed)
+          if (GetMotorConfig(REAL_RIGHT_SPEED))
           {
             hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
             EDIT_SetText(hItem, "500");
@@ -666,32 +662,28 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_RELEASED:
         // USER START (Optionally insert code for reacting on notification message)
         hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_6);
-        if (MotorConfig.real_right_speed)
+        if (GetMotorConfig(REAL_RIGHT_SPEED))
         {
-          //MotorConfig.real_right_speed = 0;
-          StopSpecificMotor(&MotorConfig, 1);
+          StopSpecificMotor(RIGHT_MOTOR);
           BUTTON_SetText(hItem, "右开始");
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
           EDIT_SetText(hItem, "0");
         }
         else
         {
-          //MotorConfig.real_right_speed = MotorConfig.set_right_speed;
-          StartSpecificMotor(&MotorConfig, 1);
+          StartSpecificMotor(RIGHT_MOTOR);
           BUTTON_SetText(hItem, "右停止");
           hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_4);
-          EDIT_SetText(hItem, Int2String(-MotorConfig.real_right_speed+5500, str));
+          EDIT_SetText(hItem, Int2String(-GetMotorConfig(REAL_RIGHT_SPEED) + 5500, str));
         }
 
         // Update the Start button
-        if (MotorConfig.real_left_speed || MotorConfig.real_right_speed)
+        if (GetMotorConfig(REAL_LEFT_SPEED) || GetMotorConfig(REAL_RIGHT_SPEED))
         {
-          MotorConfig.enable = 1;
           BUTTON_SetText(StartItem, "停止");
         }
         else
         {
-          MotorConfig.enable = 0;
           BUTTON_SetText(StartItem, "开始");
         }
 

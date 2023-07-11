@@ -190,13 +190,23 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         {
 
           hItem = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_0);
-          if (MotorConfig.enable)
+          if (GetMotorConfig(REAL_LEFT_SPEED) || GetMotorConfig(REAL_RIGHT_SPEED))
           {
             BUTTON_SetFont(hItem, FontMenuMSBlack24);
             BUTTON_SetText(hItem, "开始");
             BUTTON_SetText(LeftStopItem, "左开始");
             BUTTON_SetText(RightStopItem, "右开始");
-            Motor_Stop(&MotorConfig);
+            
+            if (GetMotorConfig(REAL_LEFT_SPEED)) // If the left motor is operating
+            {
+              StopSpecificMotor(LEFT_MOTOR);
+            }
+            if (GetMotorConfig(REAL_RIGHT_SPEED)) // If the right motor is operating
+            {
+              StopSpecificMotor(RIGHT_MOTOR);
+            }
+            
+            //TODO Motor_Stop(&MotorConfig);
             
             EDIT_SetText(EditLeftRealSpeed, "0");
             EDIT_SetText(EditRightRealSpeed, "0");
@@ -204,7 +214,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             EDIT_SetText(SingleEditLeftRealSpeed, "0");
             EDIT_SetText(SingleEditRightRealSpeed, "0");
 
-            MotorConfig.mode = 0;
+            //TODO MotorConfig.mode = 0;
           }
           else
           {
@@ -212,17 +222,19 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             BUTTON_SetText(hItem, "停止");
             BUTTON_SetText(LeftStopItem, "左停止");
             BUTTON_SetText(RightStopItem, "右停止");
-            Motor_Start(&MotorConfig);
-            if (MotorConfig.real_left_speed) // If real right speed is not zero
+            //TODO Motor_Start(&MotorConfig);
+            if (!GetMotorConfig(REAL_LEFT_SPEED)) // If the left motor is not operating
             {
-              EDIT_SetText(EditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed + 5500), str));
-              EDIT_SetText(SingleEditLeftRealSpeed, Int2String((int)(-MotorConfig.real_left_speed + 5500), str));
+              StartSpecificMotor(LEFT_MOTOR);
+              EDIT_SetText(EditLeftRealSpeed, Int2String((int)(-GetMotorConfig(REAL_LEFT_SPEED) + 5500), str));
+              EDIT_SetText(SingleEditLeftRealSpeed, Int2String((int)(-GetMotorConfig(REAL_LEFT_SPEED) + 5500), str));
             }
-            if (MotorConfig.real_right_speed) // If real right speed is not zero
+            
+            if (!GetMotorConfig(REAL_RIGHT_SPEED))  // If the right motor is not operating
             {
-              
-              EDIT_SetText(EditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed + 5500), str));
-              EDIT_SetText(SingleEditRightRealSpeed, Int2String((int)(-MotorConfig.real_right_speed + 5500), str));
+              StartSpecificMotor(RIGHT_MOTOR);
+              EDIT_SetText(EditRightRealSpeed, Int2String((int)(-GetMotorConfig(REAL_RIGHT_SPEED) + 5500), str));
+              EDIT_SetText(SingleEditRightRealSpeed, Int2String((int)(-GetMotorConfig(REAL_RIGHT_SPEED) + 5500), str));
             }
           }
           // TODO
@@ -246,7 +258,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
         // Switch the direction of motor
         // TODO printf del
         printf("\r\ndir presed\r\n");
-        if (ChangeDirection(&MotorConfig))
+        if (ChangeDirection())
         {
           TEXT_SetFont(DualDirectionItem, FontMenuMSBlack24);
           TEXT_SetTextAlign(DualDirectionItem, GUI_TA_HCENTER | GUI_TA_VCENTER);

@@ -1,12 +1,47 @@
+# 目标3
+
+PCB版图设计
+
+- [ ] 搞清楚设计流程
+
+## 问题
+
+0. <span style="color:red;font-weight:bold">设计PCB的流程？</span>以下是暂时想到的可能需要考虑的问题：
+
+1. 需要的外设和引脚（<span  style="color:blue">蓝色</span>代表我不太确定是否需要，<span  style="color:orange">橙色</span>代表我不知道需要的参数规格）：
+
+   - 最小系统：
+
+     - 芯片：stm32f7IGT6
+
+     - 供电模块
+     - LCD接口
+     - <span  style="color:orange">SDRAM</span>（我们的GUI要多大的SDRAM？）
+     - <span  style="color:blue">FLASH</span>
+     - <span  style="color:blue">USB转串口</span>（是否需要调试？）
+     - <span  style="color:blue">电源指示LED</span>
+     - <span  style="color:blue">电压测试点</span>(正点原子的主板上有3个：5V，3V3，GND，可用来测试核心板的电源是否正 常 。也可以给核心板供电)
+     - <span  style="color:blue">WK_UP按键、复位按键</span>
+
+   - 需要用到的引脚：
+
+     - Timer2和Timer5的CH1和CH2，四个引脚控制两个电机
+     - LCD相关的引脚接屏幕
+     - GND若干
+     - <span  style="color:orange">ADC采样引脚</span>(需要多少路采样？)
+
+2. PCB板的规格？有无特殊要求？各种器件的选型？是否要设计一些外部电路（隔离电路等？）
+
 # 目标2.1
 
 ## 改进手动程序
 
-- [ ] 程序逻辑优化，精简架构
-  - [ ] 添加`get()`和`set()`方法， 隔离结构体和页面操作
-  - [ ] 让双电机控制使用新的`start()`和`stop()`函数
-  - [ ] 把各种`#define`改成枚举
+- [x] 程序逻辑优化，精简架构
+  - [x] 添加`get()`和`set()`方法， 隔离结构体和页面操作
+  - [x] 让双电机控制使用新的`start()`和`stop()`函数
+  - [x] 把各种`#define`改成枚举
 - [ ] LED指示是否需要？
+- [ ] 要不要看门狗模块？
 - [ ] 后续的采样--如何反映到emWin界面显示上去？（猜测和“重绘”机制有关，或者更新时是否可以使用自定义的用户消息?)
 
 ## 缺陷

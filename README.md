@@ -14,10 +14,10 @@
 - 左路电机：Timer2控制，PA5对应通道1，远离中心； PA1对应通道2，接近中心
 - 右路电机：Timer5控制，PH10对应通道1，远离中心; PH11对应通道2，接近中心
 
-<img src="C:\Users\Administrator\Desktop\fiber-tapering-machine\Docs\Images\GUI1.png" style="zoom:75%;" />				<img src="C:\Users\Administrator\Desktop\fiber-tapering-machine\Docs\Images\GUI2.png" style="zoom:75%;" />
+<img src=".\Docs\Images\GUI1.png" style="zoom:75%;" />				<img src=".\Docs\Images\GUI2.png" style="zoom:75%;" />
 
 ## 原理图
 
 目前初步对原理图进行了绘制，正在进行微调检查和PCB的绘制。
 
-![](C:\Users\Administrator\Desktop\fiber-tapering-machine\Docs\Images\SCH_v1.0.png)
+![](.\Docs\Images\SCH_v1.0.png)

@@ -4,7 +4,24 @@ http://www.openedv.com/posts/list/32730.htm
 </br>
 
 # LCD
-LCD的编号id是5510
+RGB LCD和MCU LCD是不一样的。
+
+**主要区别：**
+
+MCU接口方式：显示数据写入DDRAM，常用于静止图片显示。
+
+RGB接口方式：显示数据不写入DDRAM，直接写屏，速度快，常用于显示视频或动画用。
+
+详见：[嵌入式LCD的接口类型详解](https://zhuanlan.zhihu.com/p/408175453#:~:text=%E5%B5%8C%E5%85%A5%E5%BC%8FLCD%E7%9A%84%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E8%AF%A6%E8%A7%A3%201%201.MCU%E6%8E%A5%E5%8F%A3%3A%E4%BC%9A%E8%A7%A3%E7%A0%81%E5%91%BD%E4%BB%A4%EF%BC%8C%E7%94%B1timing%20generator%E4%BA%A7%E7%94%9F%E6%97%B6%E5%BA%8F%E4%BF%A1%E5%8F%B7%EF%BC%8C%E9%A9%B1%E5%8A%A8COM%E5%92%8CSEG%E9%A9%B1%E5%99%A8%E3%80%82%20RGB%E6%8E%A5%E5%8F%A3%3A%E5%9C%A8%E5%86%99LCD%20register,setting%E6%97%B6%EF%BC%8C%E5%92%8CMCU%E6%8E%A5%E5%8F%A3%E6%B2%A1%E6%9C%89%E5%8C%BA%E5%88%AB%E3%80%82%20%E5%8C%BA%E5%88%AB%E5%8F%AA%E5%9C%A8%E4%BA%8E%E5%9B%BE%E5%83%8F%E7%9A%84%E5%86%99%E5%85%A5%E6%96%B9%E5%BC%8F%E3%80%82%202%202.%E7%94%A8MCU%E6%A8%A1%E5%BC%8F%E6%97%B6%E7%94%B1%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%8F%AF%E4%BB%A5%E5%85%88%E5%AD%98%E5%88%B0IC%E5%86%85%E9%83%A8GRAM%E5%90%8E%E5%86%8D%E5%BE%80%E5%B1%8F%E4%B8%8A%E5%86%99%EF%BC%8C%E6%89%80%E4%BB%A5%E8%BF%99%E7%A7%8D%E6%A8%A1%E5%BC%8FLCD%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E6%8E%A5%E5%9C%A8MEMORY%E7%9A%84%E6%80%BB%E7%BA%BF%E4%B8%8A%E3%80%82%20%E7%94%A8RGB%E6%A8%A1%E5%BC%8F%E6%97%B6%E5%B0%B1%E4%B8%8D%E5%90%8C%E4%BA%86%EF%BC%8C%E5%AE%83%E6%B2%A1%E6%9C%89%E5%86%85%E9%83%A8RAM%EF%BC%8CHSYNC%EF%BC%8CVSYNC%EF%BC%8CENABLE%EF%BC%8CCS%EF%BC%8CRESET%EF%BC%8CRS%E5%8F%AF%E4%BB%A5%E7%9B%B4%E6%8E%A5%E6%8E%A5%E5%9C%A8MEMORY%E7%9A%84GPIO%E5%8F%A3%E4%B8%8A%EF%BC%8C%E7%94%A8GPIO%E5%8F%A3%E6%9D%A5%E6%A8%A1%E6%8B%9F%E6%B3%A2%E5%BD%A2.%203%203.MPU%E6%8E%A5%E5%8F%A3%E6%96%B9%E5%BC%8F%EF%BC%9A%E6%98%BE%E7%A4%BA%E6%95%B0%E6%8D%AE%E5%86%99%E5%85%A5DDRAM%EF%BC%8C%E5%B8%B8%E7%94%A8%E4%BA%8E%E9%9D%99%E6%AD%A2%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E3%80%82)
+
+当前使用的 MCU LCD的编号id是5510，可以通过对应的读取指令来读取。
+
+RGB LCD的id：
+
+> STM32F7开发指南-HAL库版本：p391:
+>
+> ...而LCD_R7/G7/B7则用来设置LCD的ID，由于RGB LCD没有读写寄存器，也就没有所谓的ID，这里我们通过在模块上面，控制R7/G7/B7的上/下拉，来定义LCD模块的ID，帮助MCU判断当前LCD的分辨率和相关参数，以提高程序兼容性。
+
 ## Datasheet 
 <a href="https://max.book118.com/html/2020/0724/5132043242002321.shtm">Alientek 4.3' TFTLCD</a>
 
@@ -27,7 +44,7 @@ RS: 数据\命令标志（0表示命令，1表示数据）
 ## FCM--可变存储控制器
 总共管理1.5GB空间，分为6个存储块（bank），每个存储块大小为256MB，分为4个区，每个区大小为64MB。
 
-Bank1的256MB = ${2}^{28}$由HADDR[28:0]来寻址，其中[26:27]是对四个区进行选择。[25:0]是外部存储器的地址，LCD屏使用16位宽度，FMC内部HADDR与存储器寻址地址的关系：HADDR[25:1] -> FMC_A[24:0] (按字寻址，所以要除以2)
+Bank1的256MB = $ {2}^{28} $由HADDR[28:0]来寻址，其中[26:27]是对四个区进行选择。[25:0]是外部存储器的地址，LCD屏使用16位宽度，FMC内部HADDR与存储器寻址地址的关系：HADDR[25:1] -> FMC_A[24:0] (按字寻址，所以要除以2)
 
 HCLK时钟周期为4.6ns左右。读取数据的速度会慢一些，数据保持时间大约为80个HCLK周期，地址保持时间为15个HCLK周期；写数据会快一些，两个时间都只需要4个HCLK周期就可以了。
 
@@ -66,10 +83,16 @@ FMC_BWTRx: 闪写时序寄存器
 
 # 触摸屏实验
 
-
 <span style="color:red; font-weight:bold">注：如果你打算使用emWin来创建图形界面那么你会发现emWin<u>操作触摸屏的方式</u>和本节内容<u>操作触摸屏的方式</u>是没什么关联的</span>
 
-我们使用的是电容屏幕，使用GT9147集成芯片驱动。
+> 正点原子：p601：
+>
+> 电容触摸屏一般都需要一个驱动IC来检测电容触摸，且一般都是使用IIC接口输出触摸数据。....本例程除了CPLD方案的V1版本7寸屏幕模块不支持以外，其他所有Alientek的LCD模块都支持。
+
+我们使用的是电容屏幕，使用GT9147集成芯片驱动来检测电容触摸。
+
+**其他补充**：FT5206和FT5426的驱动代码是一模一样的，在正点原子的例程里它们共用一个`.c`文件。
+
 ## GT9147
 四根线：SDA、SCL、RST、INT
 
@@ -78,6 +101,8 @@ IIC对应的两根线，复位一根线，中断输出信号一根线
 - IIC地址：复位后5ms内INT为高电平，则为0x14，否则为0x5D
 - 只要简单初始化就可以使用：硬复位-->延时10ms -> 结束硬复位--> 设置IIC地址 --> 延时100ns --> 软复位 --> 更新配置 --> 结束软复位; 之后，不停查询0x814E寄存器检查是否有触点按下
 - 详情可参考开发指南和GT9147编程指南.pdf
+
+
 
 ## 软件编程
 ```c
@@ -366,3 +391,128 @@ static void _cbDialog(WM_MESSAGE *pMsg){
 ## 七、其他注意事项
 
 改变Timer的周期时，请先停止再重新初始化，直接改寄存器会出bug
+
+
+
+# 原理图绘制
+
+- 最小系统板：minimum system board
+- 
+
+- P2576电压转换芯片
+- [正点原子STM32F429核心板的插座型号](https://blog.csdn.net/youngwah292/article/details/119495119#:~:text=%E8%BF%99%E4%B8%A4%E4%B8%AA%E6%8F%92%E5%BA%A7%E5%9E%8B%E5%8F%B7%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%20%E5%9C%A8%E6%A0%B8%E5%BF%83%E6%9D%BF%E4%B8%8A%E5%AE%89%E8%A3%85%E7%9A%84%E8%BF%99%E4%B8%A4%E4%B8%AA%E6%8F%92%E5%BA%A7%EF%BC%8C%E6%98%AF3710F%E6%8F%92%E5%BA%A7%EF%BC%88%E5%85%AC%E5%A4%B4%EF%BC%89%E3%80%82,%E9%82%A3%E4%B9%88%E4%B8%8E%E4%B9%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%98%AF3710F%E6%8F%92%E5%BA%A7%EF%BC%88%E6%AF%8D%E5%BA%A7%EF%BC%89%EF%BC%8C%E5%A6%82%E4%B8%8B%E5%9B%BE%E6%89%80%E7%A4%BA%E3%80%82%20%E5%AE%83%E6%9C%8960%E4%B8%AA%E5%BC%95%E8%84%9A%EF%BC%8C%E4%B8%A4%E4%BE%A7%E5%90%8430%E4%B8%AA%E3%80%82%20%E6%AD%A3%E7%82%B9%E5%8E%9F%E5%AD%90%E5%AE%98%E7%BD%91%E6%9C%89%E8%BF%99%E7%A7%8D%E8%B4%AD%E4%B9%B0%E8%BF%9E%E6%8E%A5%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%90%9C%E7%B4%A2%E2%80%9C3710F%E6%9D%BF%E5%AF%B9%E6%9D%BF%E8%BF%9E%E6%8E%A5%E5%99%A8%E2%80%9D%E6%9F%A5%E6%89%BE%E8%B4%AD%E4%B9%B0%E3%80%82)
+
+## 问题
+
+- [x] EEPROM用来干啥 --- 用于存储一些掉电不能丢失的重要数据，比如系统设置的一些参数/触摸屏的校准数据等等。
+- [x] 是否需要电压测试端？
+
+- [ ] BOOT0和BOOT1
+
+- [ ] 中文参考手册：VREF– 如果可用（**取决于封装**），则必须将其连接到 VSSA。？
+
+- [ ] 模拟地和数字地
+
+> 这里还需要说明一下ADC的参考电压，阿波罗STM32F7开发板使用的是STM32F7IGT6，该芯片只有Vref+参考电压引脚，输入范围为：1.8 ~ VDDA。开发板通过P5端口，来设置Vref+的参考电压，默认的是我们通过跳线帽将ref+接到3.3V,参考电压就是3.3V。
+
+- [x] 没有晶振---有，正点原子的开发板的HSE接的是25MHz外部晶振
+
+- [ ] 是否需要USB供电？
+
+## 一、基础器件选型
+
+### 电容
+
+- 贴片电容104，105是什么意思？答：就是10 * 10^4^ pF = 100nF。同理，105就是1uF。[Capacitor Code Calculation with chart](https://easyelectronicsproject.com/testing-components/capacitor-code/)
+
+>电容量由3位字母数字表示。单位皮法（pF）。第1位和第2位数字为有效数字，第3位数字表示有效数字后的0的个数。有小数点时以大写字母“R”表示。此时，所有数字均为有效数字。
+
+参考：https://zhidao.baidu.com/question/241657343543282124.html
+
+举例：225 --> 22 * 10^(5) pF = 2.2uF
+
+## 二、电源部分
+
+### TODO：
+
+- 3.3v power switch 的 VUSB
+
+### 名词解释
+
+VBTN：电源适配器输入的12V电压经电源转换芯片转换后得到的5V电压。
+
+VUSB：通过USB 接口输入的电压。
+
+去耦和旁路电容：见<a href="https://zhuanlan.zhihu.com/p/98398625">这篇帖子</a>
+
+布局布线：
+
+#### 去耦电容
+
+[去耦电容（3）- 电容该如何布局布线？](https://zhuanlan.zhihu.com/p/97110481) 
+
+[360°详解去耦电容，真正的理解及在真正工程中的使用](https://blog.csdn.net/ima_xu/article/details/85008406#:~:text=%E5%8E%BB%E8%80%A6%E7%94%B5%E5%AE%B9%E7%9A%84PCB%E5%B8%83%E5%B1%80%E5%B8%83%E7%BA%BF%201%201.%E5%8E%9F%E7%90%86%20%E5%85%88%E7%9C%8B%E4%B8%80%E4%B8%AA%E5%BE%88%E5%BD%A2%E8%B1%A1%E7%9A%84%E5%8A%A8%E5%9B%BE%EF%BC%8C%E7%9B%B4%E8%A7%82%E4%BD%93%E4%BC%9A%E4%B8%80%E4%B8%8B%E4%B8%80%E4%B8%AA%E7%94%B5%E5%AE%B9%E6%94%BE%E7%BD%AE%E4%BD%8D%E7%BD%AE%E4%B8%8D%E5%90%8C%E8%B5%B7%E5%88%B0%E7%9A%84%E4%BD%9C%E7%94%A8%E6%9C%89%E5%A4%9A%E5%A4%A7%E7%9A%84%E5%B7%AE%E5%BC%82%E3%80%82%20%E8%BF%99%E5%BC%A0%E5%8A%A8%E5%9B%BE%E4%BC%A0%E9%80%92%E4%BA%86%E5%A6%82%E4%B8%8B%E7%9A%84%E4%BF%A1%E6%81%AF%EF%BC%9A%20%E5%9C%A8%E7%94%B5%E6%BA%90%E7%AE%A1%E8%84%9A%E4%B8%8A%E6%94%BE%E7%BD%AE%E4%B8%80%E4%B8%AA104%EF%BC%880.1%CE%BCF%EF%BC%89%E7%9A%84%E7%94%B5%E5%AE%B9%E8%83%BD%E5%A4%9F%E6%9C%89%E6%95%88%E6%8A%91%E5%88%B6%E7%94%B5%E6%BA%90%E4%B8%8A%E7%9A%84%E5%99%AA%E5%A3%B0%EF%BC%8C%E4%B9%9F%E5%B0%B1%E6%98%AF%E8%83%BD%E5%A4%9F%E5%AF%B9%E7%94%B5%E6%BA%90%E5%99%AA%E5%A3%B0%E5%8E%BB%E8%80%A6%EF%BC%9B%20%E2%80%9C%E7%94%B5%E6%BA%90%20%E2%80%93,%E6%9D%A5%E7%9C%8B%E5%85%B7%E4%BD%93%E7%9A%84%E5%AE%9E%E4%BE%8B%20%E5%9C%A8%E5%B8%B8%E7%94%A8%E5%8D%95%E7%89%87%E6%9C%BAstm32f103c8t6%E6%9C%80%E5%B0%8F%E7%B3%BB%E7%BB%9F%E4%B8%AD%EF%BC%8C%E5%B8%B8%E5%B8%B8%E6%9C%89%E8%BF%99%E6%A0%B7%E5%9B%9B%E4%B8%AA%E5%8E%BB%E8%80%A6%E7%94%B5%E5%AE%B9%EF%BC%8C%E5%88%86%E5%88%AB%E5%AF%B9%E5%BA%94%E8%8A%AF%E7%89%87%E7%9A%84%E5%9B%9B%E5%AF%B9%E4%BE%9B%E7%94%B5%E5%BC%95%E8%84%9A%20...%203%203.%E6%80%BB%E7%BB%93%20%E4%B8%8B%E9%9D%A2%E7%9A%84%E5%9B%BE%E6%98%AF%E5%8E%BB%E8%80%A6%E7%94%B5%E5%AE%B9%E9%80%9A%E8%BF%87%E8%BF%87%E5%AD%94%E4%B8%8E%E5%9C%B0%E8%BF%9B%E8%A1%8C%E8%BF%9E%E9%80%9A%E7%9A%84%E6%96%B9%E6%B3%95%E6%AF%94%E8%BE%83%EF%BC%8C%E4%BB%8E%E6%9C%80%E5%B7%A6%E4%BE%A7%E7%9A%84%E6%95%88%E6%9E%9C%E6%9C%80%E5%B7%AE%E4%BE%9D%E6%AC%A1%E7%BC%96%E5%8F%B7%EF%BC%8C%E7%9B%B4%E5%88%B0%E6%9C%80%E5%8F%B3%E4%BE%A7%E6%95%88%E6%9E%9C%E6%9C%80%E4%BD%B3%EF%BC%8C%E5%BD%93%E7%84%B6%E5%85%B7%E4%BD%93%E9%87%87%E7%94%A8%E9%82%A3%E7%A7%8D%E6%96%B9%E5%BC%8F%E8%BF%98%E8%A6%81%E5%8F%96%E5%86%B3%E4%BA%8E%E5%85%B6%E5%AE%83%E4%B8%80%E4%BA%9B%E5%9B%A0%E7%B4%A0%EF%BC%8C%E7%BB%BC%E5%90%88%E8%80%83%E8%99%91%E5%90%8E%E5%81%9A%E4%B8%80%E4%B8%AA%E6%8A%98%E8%A1%B7%E3%80%82%20%E4%B8%8B%E5%9B%BE%E6%98%AF%E4%B8%80%E4%B8%AA%E5%AE%9E%E9%99%85%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BE%9B%E7%94%B5%E5%88%86%E5%B8%83%E7%BD%91%E7%BB%9C%EF%BC%8C%E4%B8%BA%E4%BA%86%E5%BC%BA%E8%B0%83%E5%99%AA%E5%A3%B0%E7%9A%84%E8%B5%B7%E6%BA%90%EF%BC%88%E6%9C%80%E5%B7%A6%E4%BE%A7%EF%BC%89%EF%BC%8C%E6%8A%8A%E7%94%B5%E6%BA%90%E6%A8%A1%E5%9D%97%EF%BC%88VRM%EF%BC%89%E6%94%BE%E5%88%B0%E4%BA%86%E6%9C%80%E5%8F%B3%E4%BE%A7%E3%80%82%20)
+
+[由多个电容组成的去耦旁路电路，电容怎么布局摆放](https://blog.csdn.net/qq_57148694/article/details/130213657#:~:text=%E5%8F%AF%E8%A7%81%E5%A4%A7%E7%94%B5%E5%AE%B9%EF%BC%881uF%EF%BC%89%E7%9A%84%E8%87%AA%E8%B0%90%E6%8C%AF%E7%82%B9%E4%BD%8E%E4%BA%8E%E5%B0%8F%E7%94%B5%E5%AE%B9,%2810nF%29%EF%BC%8C%E7%9B%B8%E5%BA%94%E7%9A%84%EF%BC%8C%E5%A4%A7%E7%94%B5%E5%AE%B9%E5%AF%B9%E5%AE%89%E8%A3%85%E7%9A%84PCB%E7%94%B5%E8%B7%AF%E6%9D%BF%E4%B8%8A%E4%BA%A7%E7%94%9F%E7%9A%84%E5%AF%84%E7%94%9F%E7%AD%89%E6%95%88%E4%B8%B2%E8%81%94%E7%94%B5%E6%84%9FESL%E7%9A%84%E6%95%8F%E6%84%9F%E5%BA%A6%E5%B0%8F%E4%BA%8E%E5%B0%8F%E7%94%B5%E5%AE%B9%E3%80%82%20%E6%89%80%E4%BB%A5%EF%BC%8C%E5%B0%8F%E7%94%B5%E5%AE%B9%E5%BA%94%E8%AF%A5%E5%B0%BD%E9%87%8F%E9%9D%A0%E8%BF%91IC%E7%9A%84%E7%94%B5%E6%BA%90%E5%BC%95%E8%84%9A%E6%91%86%E6%94%BE%EF%BC%8C%E5%A4%A7%E7%94%B5%E5%AE%B9%E7%9A%84%E6%91%86%E6%94%BE%E4%BD%8D%E7%BD%AE%E7%9B%B8%E5%AF%B9%E5%AE%BD%E6%9D%BE%E4%B8%80%E4%BA%9B%EF%BC%8C%E4%BD%86%E9%83%BD%E5%BA%94%E8%AF%A5%E5%B0%BD%E9%87%8F%E9%9D%A0%E8%BF%91IC%E6%91%86%E6%94%BE%EF%BC%8C%E4%B8%8D%E8%83%BD%E7%A6%BBIC%E8%B7%9D%E7%A6%BB%E5%A4%AA%E8%BF%9C%EF%BC%8C%E8%B6%85%E8%BF%87%E5%85%B6%E5%8E%BB%E8%80%A6%E5%8D%8A%E5%BE%84%EF%BC%8C%E4%BE%BF%E4%BC%9A%E5%A4%B1%E5%8E%BB%E5%8E%BB%E8%80%A6%E4%BD%9C%E7%94%A8%E3%80%82)
+
+#### 晶振
+
+[不论小白还是大佬，这篇PCB晶振设计不得不看](https://www.eefocus.com/article/460948.html)
+
+### DC连接器的选择
+
+- 参考文章：[DC插座的规格分类以及型号选购](https://zhuanlan.zhihu.com/p/101291143)
+- 看开发板上应该使用的是DC-005，参考：[DC电源座](https://blog.csdn.net/ktd007/article/details/116230168)，[datasheet](https://atta.szlcsc.com/upload/public/pdf/source/20220407/3CBD1766F01FEBEE4B805AFD8C8D65AF.pdf)
+
+### 开关
+
+常态：2-3和5-6导通
+
+按下：1-2和4-5导通
+
+[开关的datasheet](https://atta.szlcsc.com/upload/public/pdf/source/20211015/75A682A27A424BDE8D93C2CFA14C38FE.pdf)
+
+### Vref
+
+直接接入3.3V
+
+> 正点原子开发板：“...这里还需要说明一下ADC的参考电压，阿波罗STM32F7开发板使用的是STM32F7IGT6，该芯片只有Vref+参考电压引脚，输入范围为：1.8 ~ VDDA。开发板通过P5端口，来设置Vref+的参考电压，默认的是我们通过跳线帽将ref+接到3.3V,参考电压就是3.3V。“
+
+## 三、时钟部分
+
+使用25MHz的晶振作为HSE时钟源。
+
+- 如何选取负载电容：[Choosing the Right Oscillator for Your Microcontroller](https://www.allaboutcircuits.com/technical-articles/choosing-the-right-oscillator-for-your-microcontroller/)
+  - 到晶振的Datasheet里查找总负载电容的值（C<sub>LTOTAL</sub>)，然后估计一下寄生电容C<sub>p</sub>的值，最后套用公式：
+  - ![](.\Images\OSC-cap-cal.png)
+
+## 四、复位
+
+用于复位STM32芯片
+
+- [x] 把LCD的复位引脚和reset连接到一起
+
+## 五、RGB LCD
+
+接口是40+2脚，使用RGB565颜色格式。
+
+# PCB绘制
+
+
+
+<img src="C:\Users\Administrator\Desktop\Q\敷铜注意.png" style="zoom:75%;" />
+
+# 焊接与调试
+
+## 单片机上电不运行怎么办
+
+1. 首先检查电源电压是否正常：用电压表测量接地引脚和电源引脚之间的电压，看看电压是否正确；
+2. 其次检查复位引脚：分别测量按下和松开复位按钮时的电压值，看看是否正确。
+3. 然后再检查晶振是否起振了，一般用示波器来看晶振引脚的波形。
+4. 检查mcu是否虚焊漏焊或损坏或flash无法下载。
+
+# EMWIN
+
+Since widgets are actually windows with enhanced functionality, it is required to create a window with capabillities to store additional data.
+
+**Warning: The end user must not use the function WM_GetUserData() or WM_SetUserData() with a widget of a custom type as it is implemented using this guide, since the user would either overwrite widget specific data, or not retrieve the expected data.**

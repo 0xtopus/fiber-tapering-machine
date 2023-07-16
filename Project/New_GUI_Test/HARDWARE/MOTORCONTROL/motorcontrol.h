@@ -6,10 +6,6 @@
 #define GET_CLOSER 0
 #define GET_AWAY   1
 
-#define DUAL_MODE  0
-#define LEFT_MODE  1
-#define RIGHT_MODE 2
-
 #define RIGHT_MOTOR 1
 #define LEFT_MOTOR  0
 

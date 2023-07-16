@@ -48,7 +48,7 @@
  *
  **********************************************************************
  */
-// TODO WM_HWIN PageItem;
+
 GUI_HWIN StartItem;
 
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontFontMenu24;
@@ -205,16 +205,13 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             {
               StopSpecificMotor(RIGHT_MOTOR);
             }
-            
-            //TODO Motor_Stop(&MotorConfig);
-            
+        
             EDIT_SetText(EditLeftRealSpeed, "0");
             EDIT_SetText(EditRightRealSpeed, "0");
 
             EDIT_SetText(SingleEditLeftRealSpeed, "0");
             EDIT_SetText(SingleEditRightRealSpeed, "0");
 
-            //TODO MotorConfig.mode = 0;
           }
           else
           {
@@ -222,7 +219,6 @@ static void _cbDialog(WM_MESSAGE *pMsg)
             BUTTON_SetText(hItem, "停止");
             BUTTON_SetText(LeftStopItem, "左停止");
             BUTTON_SetText(RightStopItem, "右停止");
-            //TODO Motor_Start(&MotorConfig);
             if (!GetMotorConfig(REAL_LEFT_SPEED)) // If the left motor is not operating
             {
               StartSpecificMotor(LEFT_MOTOR);
@@ -237,9 +233,6 @@ static void _cbDialog(WM_MESSAGE *pMsg)
               EDIT_SetText(SingleEditRightRealSpeed, Int2String((int)(-GetMotorConfig(REAL_RIGHT_SPEED) + 5500), str));
             }
           }
-          // TODO
-          // printf("\r\nsstartpressed\r\n");
-          // printf("\r\n%u\r\n", MotorConfig.direction);
         }
         break;
         // USER START (Optionally insert additional code for further notification handling)
@@ -256,8 +249,6 @@ static void _cbDialog(WM_MESSAGE *pMsg)
       case WM_NOTIFICATION_RELEASED:
       {
         // Switch the direction of motor
-        // TODO printf del
-        printf("\r\ndir presed\r\n");
         if (ChangeDirection())
         {
           TEXT_SetFont(DualDirectionItem, FontMenuMSBlack24);

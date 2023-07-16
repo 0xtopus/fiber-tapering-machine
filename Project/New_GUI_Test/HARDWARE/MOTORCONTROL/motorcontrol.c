@@ -2,6 +2,9 @@
 #include "led.h"
 #include "timer.h"
 
+#define TIM_LEFT_HANDLE &TIM2_Handler
+#define TIM_RIGHT_HANDLE &TIM5_Handler
+
 MotorControlStruct MotorConfig = {5000, 5000, 0, 0, 0};
 
 /**
@@ -72,11 +75,11 @@ u8 StopSpecificMotor(u8 the_given_motor)
     {
         if (MotorConfig.direction)
         {
-            HAL_TIM_PWM_Stop(&TIM5_Handler, TIM_CHANNEL_1);
+            HAL_TIM_PWM_Stop(TIM_LEFT_HANDLE, TIM_CHANNEL_1);
         }
         else
         {
-            HAL_TIM_PWM_Stop(&TIM5_Handler, TIM_CHANNEL_2);
+            HAL_TIM_PWM_Stop(TIM_LEFT_HANDLE, TIM_CHANNEL_2);
         }
         MotorConfig.real_right_speed = 0;
     }
@@ -84,11 +87,11 @@ u8 StopSpecificMotor(u8 the_given_motor)
     {
         if (MotorConfig.direction)
         {
-            HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_1);
+            HAL_TIM_PWM_Stop(TIM_LEFT_HANDLE, TIM_CHANNEL_1);
         }
         else
         {
-            HAL_TIM_PWM_Stop(&TIM2_Handler, TIM_CHANNEL_2);
+            HAL_TIM_PWM_Stop(TIM_LEFT_HANDLE, TIM_CHANNEL_2);
         }
         MotorConfig.real_left_speed = 0;
     }

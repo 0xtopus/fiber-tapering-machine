@@ -1,3 +1,13 @@
+PCB --> **修改**
+
+**采购** --> 自动
+
+**机械设计（夹具）** --> 自动调试
+
+**焊接工具** --> 焊接
+
+*测试*
+
 # 目标3
 
 PCB版图设计
@@ -13,18 +23,19 @@ PCB版图设计
    - 最小系统：
 
      - 芯片：stm32f7IGT6
-
-     - 供电模块
+- 供电模块
      - LCD接口
-     - <span  style="color:orange">SDRAM</span>（我们的GUI要多大的SDRAM？）
+     - [x] 复位按键
+     - [x] 时钟电路
+     - [x] 电源指示LED
+     - [x] <span  style="color:orange">SDRAM</span>（我们的GUI要多大的SDRAM？）
      - <span  style="color:blue">FLASH</span>
      - <span  style="color:blue">USB转串口</span>（是否需要调试？）
-     - <span  style="color:blue">电源指示LED</span>
-     - <span  style="color:blue">电压测试点</span>(正点原子的主板上有3个：5V，3V3，GND，可用来测试核心板的电源是否正 常 。也可以给核心板供电)
-     - <span  style="color:blue">WK_UP按键、复位按键</span>
-
+     - [x] <span  style="color:blue">其它LED</span>
+   - <span  style="color:blue">电压测试点</span>(正点原子的主板上有3个：5V，3V3，GND，可用来测试核心板的电源是否正常 。也可以给核心板供电)
+   - <span  style="color:blue">WK_UP按键</span>
    - 需要用到的引脚：
-
+   
      - Timer2和Timer5的CH1和CH2，四个引脚控制两个电机
      - LCD相关的引脚接屏幕
      - GND若干
@@ -111,7 +122,13 @@ typedef struct
 
 右路电机：Timer5控制，PH10对应通道1，**远离中心**，对应`direction == 1`; PH11对应通道2，**接近中心**，对应`direction == 0`
 
+右路电机可能改成Timer9的CH1和CH2（如果使用RGB屏幕的话）PE5和PE6
+
 左右电机独立控制界面（左禁止/启动按钮，右禁止/启动按钮 -->对应 `mode`）
+
+### ADC采样
+
+暂定ADC3_IN4（PF6）和ADC_IN5（PF7）
 
 ---
 # 目标1

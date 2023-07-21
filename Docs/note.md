@@ -396,6 +396,10 @@ static void _cbDialog(WM_MESSAGE *pMsg){
 
 # 原理图绘制
 
+[Getting started with STM32F7 Series MCU hardware development(AN4661)](https://www.st.com/resource/en/application_note/dm00164549-getting-started-with-stm32f7-series-mcu-hardware-development-stmicroelectronics.pdf)
+
+
+
 - 最小系统板：minimum system board
 - 
 
@@ -443,11 +447,17 @@ VBTN：电源适配器输入的12V电压经电源转换芯片转换后得到的5
 
 VUSB：通过USB 接口输入的电压。
 
-去耦和旁路电容：见<a href="https://zhuanlan.zhihu.com/p/98398625">这篇帖子</a>
+[EMI、EMS和EMC简述](https://zhuanlan.zhihu.com/p/117604783)
 
-布局布线：
+EMI：[How to identify or calculate the electromagnetic interference (EMI) contribution of components on PCB](https://electronics.stackexchange.com/questions/510562/how-to-identify-or-calculate-the-electromagnetic-interference-emi-contribution)
+
+
+
+## 布局布线：
 
 #### 去耦电容
+
+去耦和旁路电容：见<a href="https://zhuanlan.zhihu.com/p/98398625">这篇帖子</a>
 
 [去耦电容（3）- 电容该如何布局布线？](https://zhuanlan.zhihu.com/p/97110481) 
 
@@ -457,7 +467,21 @@ VUSB：通过USB 接口输入的电压。
 
 #### 晶振
 
+[Oscillator design guide for STM8AF/AL/S, STM32 MCUs and MPUs (AN2867)](https://www.st.com/resource/en/application_note/cd00221665-oscillator-design-guide-for-stm8af-al-s-stm32-mcus-and-mpus-stmicroelectronics.pdf)
+
 [不论小白还是大佬，这篇PCB晶振设计不得不看](https://www.eefocus.com/article/460948.html)
+
+[什么是晶振？晶振在PCB板上如何布局？](https://zhuanlan.zhihu.com/p/582420804)
+
+[Should there be any PCB ground plane under a 16 MHz oscillator?](https://electronics.stackexchange.com/questions/308638/should-there-be-any-pcb-ground-plane-under-a-16-mhz-oscillator)
+
+
+
+#### 电源走线
+
+[pcb trace width conversion calculator](https://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-pcb-trace-width)
+
+> Every block (noisy, low-level sensitive, digital, etc.) should be grounded individually and all ground returns should be to a single point. Loops must be avoided or have a minimum area. The power supply should be implemented close to the ground line to minimize the area of the supply loop. This is due to the fact that the supply loop acts as an antenna, and is therefore the main transmitter and receiver of EMI. All component-free PCB areas must be filled with additional grounding to create a kind of shielding (especially when using singlelayer PCBs). --- AN4661
 
 ### DC连接器的选择
 
@@ -500,9 +524,25 @@ VUSB：通过USB 接口输入的电压。
 
 
 
-<img src="C:\Users\Administrator\Desktop\Q\敷铜注意.png" style="zoom:75%;" />
+<img src=".\Images\敷铜注意.png" style="zoom:75%;" />
 
 # 焊接与调试
+
+## 热风枪
+
+含铅焊锡：330~350度
+
+无铅焊锡：350~370度 
+
+贴片阻容类：2~3档
+
+贴片IC类：3~4档
+
+
+
+
+
+
 
 ## 单片机上电不运行怎么办
 

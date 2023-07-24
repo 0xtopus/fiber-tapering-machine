@@ -24,6 +24,6 @@
 
 目前初步对原理图和PCB进行了绘制，正在进行微调检查。
 
-<img src=".\Docs\Images\PCB_PCB_光纤拉锥机_2023-07-21.svg" style="zoom:175%;" />
+<img src=".\Docs\Images\PCB_PCB_光纤拉锥机_2023-07-24.svg" style="zoom:175%;" />
 
-<img src=".\Docs\Images\Schematic_光纤拉锥机_2023-07-21.png" style="zoom:75%;" />
+<img src=".\Docs\Images\Schematic_光纤拉锥机_2023-07-24.svg" style="zoom:75%;" />

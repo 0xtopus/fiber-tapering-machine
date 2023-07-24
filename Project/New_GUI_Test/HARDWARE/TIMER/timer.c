@@ -25,8 +25,8 @@ TIM_OC_InitTypeDef TIM2_CH1Handler; //! 定时器2通道1句柄
 TIM_OC_InitTypeDef TIM2_CH2Handler; //! 定时器2通道2句柄
 
 TIM_HandleTypeDef TIM5_Handler;     //! 定时器5句柄
-TIM_OC_InitTypeDef TIM5_CH1Handler; //! 定时器5通道1句柄
-TIM_OC_InitTypeDef TIM5_CH2Handler; //! 定时器5通道2句柄
+TIM_OC_InitTypeDef TIM5_CH3Handler; //! 定时器5通道3句柄
+TIM_OC_InitTypeDef TIM5_CH4Handler; //! 定时器5通道4句柄
 
 
 
@@ -114,23 +114,23 @@ void TIM5_PWM_Init(u16 arr, u16 psc, u8 direction)
     
     if (direction)    //! If the right motor needs to get away
     {
-        TIM5_CH1Handler.OCPolarity = TIM_OCPOLARITY_LOW;                            // 输出比较极性为低
-        TIM5_CH1Handler.OCMode = TIM_OCMODE_PWM1;                                   // 模式选择PWM1
-        TIM5_CH1Handler.Pulse = arr / 2;                                            //! 设置比较值,此值用来确定占空比，
+        TIM5_CH3Handler.OCPolarity = TIM_OCPOLARITY_LOW;                            // 输出比较极性为低
+        TIM5_CH3Handler.OCMode = TIM_OCMODE_PWM1;                                   // 模式选择PWM1
+        TIM5_CH3Handler.Pulse = arr / 2;                                            //! 设置比较值,此值用来确定占空比，
                                                                                     //! 占空比对我们的电机转速没有影响
                                                                                     // 默认比较值为自动重装载值的一半,即占空比为50%
-        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH1Handler, TIM_CHANNEL_1);  //! 配置TIM5通道1
-        HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_1);
+        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH3Handler, TIM_CHANNEL_3);  //! 配置TIM5通道1
+        HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_3);
     }
     else               //! If the right motor needs to get closer
     { 
-        TIM5_CH2Handler.OCPolarity = TIM_OCPOLARITY_LOW;                            // 输出比较极性为低
-        TIM5_CH2Handler.OCMode = TIM_OCMODE_PWM1;                                   // 模式选择PWM1
-        TIM5_CH2Handler.Pulse = arr / 2;                                            //! 设置比较值,此值用来确定占空比，
+        TIM5_CH4Handler.OCPolarity = TIM_OCPOLARITY_LOW;                            // 输出比较极性为低
+        TIM5_CH4Handler.OCMode = TIM_OCMODE_PWM1;                                   // 模式选择PWM1
+        TIM5_CH4Handler.Pulse = arr / 2;                                            //! 设置比较值,此值用来确定占空比，
                                                                                     //! 占空比对我们的电机转速没有影响
                                                                                     // 默认比较值为自动重装载值的一半,即占空比为50%
-        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH2Handler, TIM_CHANNEL_2);  //! 配置TIM5通道2
-        HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_2);
+        HAL_TIM_PWM_ConfigChannel(&TIM5_Handler, &TIM5_CH4Handler, TIM_CHANNEL_4);  //! 配置TIM5通道2
+        HAL_TIM_PWM_Start(&TIM5_Handler, TIM_CHANNEL_4);
     }
 }
 
@@ -158,14 +158,14 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     {
         GPIO_InitTypeDef GPIO_Initure;
         __HAL_RCC_TIM5_CLK_ENABLE();  //! 使能定时器5
-        __HAL_RCC_GPIOH_CLK_ENABLE(); //! 开启GPIOH时钟
+        __HAL_RCC_GPIOA_CLK_ENABLE(); //! 开启GPIOA时钟
 
         GPIO_Initure.Mode = GPIO_MODE_AF_PP;        // 复用推挽输出
         GPIO_Initure.Pull = GPIO_PULLDOWN;          // !下拉
         GPIO_Initure.Speed = GPIO_SPEED_HIGH;       // 高速
-        GPIO_Initure.Pin = GPIO_PIN_10 | GPIO_PIN_11; //! PH10和PH11
-        GPIO_Initure.Alternate = GPIO_AF2_TIM5;       //! PH10复用为TIM5_CH1，PH11复用为TIM5_CH2
-        HAL_GPIO_Init(GPIOH, &GPIO_Initure);
+        GPIO_Initure.Pin = GPIO_PIN_2 | GPIO_PIN_3; //! PA2和PA3
+        GPIO_Initure.Alternate = GPIO_AF2_TIM5;       //! PA2复用为TIM5_CH3，PA3复用为TIM5_CH4
+        HAL_GPIO_Init(GPIOA, &GPIO_Initure);
     }
     
 }

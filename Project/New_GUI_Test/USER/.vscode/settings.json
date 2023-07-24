@@ -8,6 +8,7 @@
         "dialog.h": "c",
         "motorcontrol.h": "c",
         "usart.h": "c",
-        "touch.h": "c"
+        "touch.h": "c",
+        "tftlcd.h": "c"
     }
 }

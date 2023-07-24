@@ -8,18 +8,6 @@
 MotorControlStruct MotorConfig = {5000, 5000, 0, 0, 0};
 
 /**
- * Start the motors as configurated.
- * @param *pMotorConfig
- * @return The current mode of MotorConfig
- */
-
-/**
- * Stop all motors.
- * @param *pMotorConfig
- * @return The current mode of MotorConfig
- */
-
-/**
  * Change the direction
  * @return the latest direction
  */
@@ -75,11 +63,11 @@ u8 StopSpecificMotor(u8 the_given_motor)
     {
         if (MotorConfig.direction)
         {
-            HAL_TIM_PWM_Stop(TIM_LEFT_HANDLE, TIM_CHANNEL_1);
+            HAL_TIM_PWM_Stop(TIM_RIGHT_HANDLE, TIM_CHANNEL_3);
         }
         else
         {
-            HAL_TIM_PWM_Stop(TIM_LEFT_HANDLE, TIM_CHANNEL_2);
+            HAL_TIM_PWM_Stop(TIM_RIGHT_HANDLE, TIM_CHANNEL_4);
         }
         MotorConfig.real_right_speed = 0;
     }

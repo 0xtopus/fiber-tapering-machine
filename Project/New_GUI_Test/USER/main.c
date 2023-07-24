@@ -39,7 +39,7 @@ int main(void)
     // TIM2_PWM_Init(500-1,108-1);
 
     my_mem_init(SRAMIN);             // 初始化内部内存池
-    my_mem_init(SRAMEX);             // 初始化外部SDRAM内存池
+    //my_mem_init(SRAMEX);             // 初始化外部SDRAM内存池
     my_mem_init(SRAMDTCM);           // 初始化内部DTCM内存池
     __HAL_RCC_CRC_CLK_ENABLE();      // 使能CRC时钟
     WM_SetCreateFlags(WM_CF_MEMDEV); // 开启STemWin存储设备

@@ -1,7 +1,24 @@
+# 时钟
+
+总共5个时钟源：HSI，HSE，LSI，LSE，PLL
+
+根据正点原子开发指南：
+
+SYSCLK = 216MHz，系统时钟源为PLL
+
+AHB的分频系数为1，为216MHz
+
+APB1分频系数为4，为54MHz
+
+APB2分频系数为2，为108MHz
+
+
+
 # GPIO配置
+
 http://www.openedv.com/posts/list/32730.htm
 
-</br>
+找各种引脚复用等，请参考datasheet（数据手册）。
 
 # LCD
 RGB LCD和MCU LCD是不一样的。
@@ -388,9 +405,49 @@ static void _cbDialog(WM_MESSAGE *pMsg){
 13. 之后你可以使用VS2019来仿真一下。如果出现 “**报错 error C2001:常量中有换行符**” ，请参考：<a href="https://blog.csdn.net/love_0_love/article/details/120024094">这篇帖子</a>解决。( 项目->右键属性->C/C++ -> 命令行，，在下方输入框添加` /utf-8`，就会在编译时采用utf-8编码来编译)
 14. 你也可以直接移植到MDK5。移植方法和之前类似，就是记得要把`.c`字符文件也添加进工程。然后打开魔法棒工具，在 options->c/c++->Misc controls 栏填写 “`--locale=english`”防止报错。
 
+
+
 ## 七、其他注意事项
 
 改变Timer的周期时，请先停止再重新初始化，直接改寄存器会出bug
+
+
+
+## 八、存储设备
+
+一般来说要在`GUI_X_Config()`函数里分配内存。
+
+详见：[A way to make emWin use an external SDRAM instead of internal RAM](https://forum.segger.com/index.php/Thread/8827-A-way-to-make-emWin-use-an-external-SDRAM-instead-of-internal-RAM/?s=cb0ab5cd9f4a7923e27d090b604a08f464dc0810)
+
+
+
+或者参考正点原子的例程：
+
+在`GUIConf.c`里:
+
+```c
+#define USE_EXRAM  0	// 0使用内部RAM, 1使用外部RAM
+#define GUI_NUMBYTES  (128*1024)	// 设置EMWIN内存大小, stm32f767igt6自带的片内RAM为512kB
+#define GUI_BLOCKSIZE 0X80  //块大小
+
+//GUI_X_Config
+//初始化的时候调用,用来设置emwin所使用的内存
+void GUI_X_Config(void) {
+	if(USE_EXRAM) //使用外部RAM
+	{	
+		U32 *aMemory = mymalloc(SRAMEX,GUI_NUMBYTES); //从外部SRAM中分配GUI_NUMBYTES字节的内存
+		GUI_ALLOC_AssignMemory((void*)aMemory, GUI_NUMBYTES); //为存储管理系统分配一个存储块
+		GUI_ALLOC_SetAvBlockSize(GUI_BLOCKSIZE); //设置存储快的平均尺寸,该区越大,可用的存储快数量越少
+		GUI_SetDefaultFont(GUI_FONT_6X8); //设置默认字体
+	} else  //使用内部RAM
+	{
+		U32 *aMemory = mymalloc(SRAMIN,GUI_NUMBYTES); //从内部RAM中分配GUI_NUMBYTES字节的内存
+		GUI_ALLOC_AssignMemory((U32 *)aMemory, GUI_NUMBYTES); //为存储管理系统分配一个存储块
+		GUI_ALLOC_SetAvBlockSize(GUI_BLOCKSIZE); //设置存储快的平均尺寸,该区越大,可用的存储快数量越少
+		GUI_SetDefaultFont(GUI_FONT_6X8); //设置默认字体
+	}
+}
+```
 
 
 
@@ -556,3 +613,13 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 Since widgets are actually windows with enhanced functionality, it is required to create a window with capabillities to store additional data.
 
 **Warning: The end user must not use the function WM_GetUserData() or WM_SetUserData() with a widget of a custom type as it is implemented using this guide, since the user would either overwrite widget specific data, or not retrieve the expected data.**
+
+
+
+# ADC
+
+## 一、ADC引脚
+
+可参见芯片自己的datasheet。不过正点原子的指南都列出来了，直接参考配置即可：
+
+<img src="..\Docs\Images\ADC_Pin.png" style="zoom:75%;" />

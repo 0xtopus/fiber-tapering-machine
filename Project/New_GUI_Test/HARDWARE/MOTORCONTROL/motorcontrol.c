@@ -124,6 +124,10 @@ u8 StartSpecificMotor(u8 the_given_motor)
     return 0;
 }
 
+
+//! The frequency of timer is 108M/108=1M,
+//! if reload value = 1000, then PWM frequency is 1M/1000=1kHZ
+//! So the range of PWM frequency is 200Hz ~ 2kHz
 /**
  * Change the set speed of the given motor.
  * @param set_value the value set by user, which will be converted to speed.

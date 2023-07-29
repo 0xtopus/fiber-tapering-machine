@@ -9,6 +9,7 @@
         "motorcontrol.h": "c",
         "usart.h": "c",
         "touch.h": "c",
-        "tftlcd.h": "c"
+        "tftlcd.h": "c",
+        "adc.h": "c"
     }
 }

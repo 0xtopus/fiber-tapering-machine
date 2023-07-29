@@ -335,7 +335,7 @@
               <MiscControls>--locale=english</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F767xx,ARM_MATH_CM7,__CC_ARM,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING,__FPU_PRESENT=1</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F7xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\KEY;..\HARDWARE\LED;..\HARDWARE\SDRAM;..\HARDWARE\LCD;..\HARDWARE\IIC;..\HARDWARE\TIMER;..\HARDWARE\24CXX;..\HARDWARE\TOUCH;..\HARDWARE\MPU;..\USMART;..\MALLOC;..\EMWIN\Demo;..\DSP_LIB\Include;..\EMWIN\STemWin\inc;..\EMWIN\STemWin\Config;..\HARDWARE\PWMOUT;..\HARDWARE\MOTORCONTROL</IncludePath>
+              <IncludePath>..\CORE;..\OBJ;..\USER;..\HALLIB\STM32F7xx_HAL_Driver\Inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\KEY;..\HARDWARE\LED;..\HARDWARE\SDRAM;..\HARDWARE\LCD;..\HARDWARE\IIC;..\HARDWARE\TIMER;..\HARDWARE\24CXX;..\HARDWARE\TOUCH;..\HARDWARE\MPU;..\USMART;..\MALLOC;..\EMWIN\Demo;..\DSP_LIB\Include;..\EMWIN\STemWin\inc;..\EMWIN\STemWin\Config;..\HARDWARE\PWMOUT;..\HARDWARE\MOTORCONTROL;..\HARDWARE\ADC</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -524,6 +524,16 @@
               <FileType>1</FileType>
               <FilePath>..\HALLIB\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f7xx_hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HALLIB\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f7xx_hal_adc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HALLIB\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_adc_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -628,6 +638,11 @@
               <FileName>motorcontrol.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\MOTORCONTROL\motorcontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\ADC\adc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1311,6 +1326,16 @@
               <FileType>1</FileType>
               <FilePath>..\HALLIB\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim_ex.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f7xx_hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HALLIB\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f7xx_hal_adc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HALLIB\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_adc_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1415,6 +1440,11 @@
               <FileName>motorcontrol.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\MOTORCONTROL\motorcontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\ADC\adc.c</FilePath>
             </File>
           </Files>
         </Group>

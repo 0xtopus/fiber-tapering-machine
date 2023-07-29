@@ -315,6 +315,7 @@ void MainTask(void)
   while (1)
   {
     GUI_Delay(10);
+    Display_Adc_Value(ADC_CHANNEL_4, 10);
   }
 }
 

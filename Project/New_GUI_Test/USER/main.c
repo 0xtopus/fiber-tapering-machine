@@ -13,6 +13,7 @@
 #include "touch.h"
 #include "GUI.h"
 #include "WM.h"
+#include "adc.h"
 
 /************************************************
  修改自：
@@ -36,7 +37,7 @@ int main(void)
     TP_Init();                       // 触摸屏初始化
     TIM3_Init(999, 107);             // 1KHZ 定时器3设置为1ms
     TIM4_Init(999, 1079);            // 触摸屏扫描速度,100HZ.
-    // TIM2_PWM_Init(500-1,108-1);
+    MY_ADC_Init();                   // 初始化ADC
 
     my_mem_init(SRAMIN);             // 初始化内部内存池
     //my_mem_init(SRAMEX);             // 初始化外部SDRAM内存池

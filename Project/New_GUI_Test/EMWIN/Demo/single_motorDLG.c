@@ -78,6 +78,8 @@ WM_HWIN SliderRightItem;
 WM_HWIN SingleEditLeftSetSpeed;
 WM_HWIN SingleEditRightSetSpeed;
 
+WM_HWIN adcEdit;
+
 GUI_HWIN LeftStopItem;
 GUI_HWIN RightStopItem;
 
@@ -245,11 +247,13 @@ static void _cbDialog(WM_MESSAGE *pMsg)
 
     //
     // Initialization of 'Edit'
+    //! 采样值
     //
     hItem = WM_GetDialogItem(pMsg->hWin, ID_EDIT_2);
-    EDIT_SetFont(hItem, FontMenuMSBlack24);
+    adcEdit = hItem;
+    EDIT_SetFont(hItem, GUI_FONT_16_ASCII);
     EDIT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-    EDIT_SetText(hItem, "霸");
+    EDIT_SetText(hItem, "0");
     //
     // Initialization of 'SampleData:'
     //

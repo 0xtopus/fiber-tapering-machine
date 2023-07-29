@@ -403,7 +403,7 @@ static void _cbDialog(WM_MESSAGE *pMsg){
 
 12. 修改GUIBuilder生成的 `.c ` 界面文件为 UTF-8 编码（不是修改 FontCvt 生成的 C文件为 UTF-8 编码！): 用记事本打开，然后另存为的时候把编码改成UTF-8，保存到原位置替换掉原文件即可。
 13. 之后你可以使用VS2019来仿真一下。如果出现 “**报错 error C2001:常量中有换行符**” ，请参考：<a href="https://blog.csdn.net/love_0_love/article/details/120024094">这篇帖子</a>解决。( 项目->右键属性->C/C++ -> 命令行，，在下方输入框添加` /utf-8`，就会在编译时采用utf-8编码来编译)
-14. 你也可以直接移植到MDK5。移植方法和之前类似，就是记得要把`.c`字符文件也添加进工程。然后打开魔法棒工具，在 options->c/c++->Misc controls 栏填写 “`--locale=english`”防止报错。
+14. 你也可以跳过仿真直接移植到MDK5。移植方法和之前类似，就是记得要把`.c`字符文件也添加进工程。然后打开魔法棒工具，在 options->c/c++->Misc controls 栏填写 “`--locale=english`”防止报错。
 
 
 
@@ -614,7 +614,7 @@ Since widgets are actually windows with enhanced functionality, it is required t
 
 **Warning: The end user must not use the function WM_GetUserData() or WM_SetUserData() with a widget of a custom type as it is implemented using this guide, since the user would either overwrite widget specific data, or not retrieve the expected data.**
 
-
+> 在主函数中我们主要完成了外设的初始化和创建 start_task 任务，我们注意到这里并没有初 始化定时器 3 和定时器 4。在无操作系统中我们使用定时器 3 来为 STemWin 提供系统时钟，使用定 时器 4 来定时处理触摸事件。在本章中我们移植有 UCOS III 操作系统，我们使用 UCOS III 系 统来为 STemWin 提供系统时钟，对于触摸事件的处理我们可以建立一个任务来完成，因此这里 就不需要使用定时器了。
 
 # ADC
 
@@ -623,3 +623,34 @@ Since widgets are actually windows with enhanced functionality, it is required t
 可参见芯片自己的datasheet。不过正点原子的指南都列出来了，直接参考配置即可：
 
 <img src="..\Docs\Images\ADC_Pin.png" style="zoom:75%;" />
+
+# 专用名词
+
+- **mantissa**: 
+
+  ​	1: The part of a number after the "."
+
+  ​	Example: in 2.71828 the **mantissa** is 0.71828
+
+
+  ​	2: In scientific notation the **mantissa** is the digits without the ×10n part.
+
+  ​	Example: in 5.3266 × 103 the mantissa is 5.3266
+
+  source: https://www.mathsisfun.com/definitions/mantissa.html
+
+  
+
+- **saturation instructions**:
+
+  ​	These instructions are used to limit a variable or a value to a certain number of bits.
+
+  ​	The ARM saturated arithmetic instructions can operate on byte, word or halfword sized values. For example, the 8 of the `QADD8` and `QSUB8` instructions indicate that they operate on byte sized values. The result of the operation is saturated to the largest possible positive or negative number. 
+
+  > For example, if you have an 8 bit variable and for sure if you know that the value of the variable will not exceed a number 127 say, you would like to round off any value above 127 as 127 itself ( saturation) and any value below 0 as zero itself. In this case you need to write a big C code using if-else conditional statement to compare the variable with 127 and take the necessary action. Instead, to simplify this logic, you can make use of the saturation assembly instructions which Cortex-M3 (core of PSoC 5LP) supports. Please note that both GCC and MDK compilers do not append this instruction by itself for an equivalent C code.
+
+  source: [saturation instructions](https://community.infineon.com/t5/PSoC-5-3-1/Importance-of-saturation-instructions/m-p/155653), and the source web has many [interesting projects](https://community.infineon.com/t5/Projects/bg-p/Projects/page/1)!
+
+  source: [Saturated math instructions](https://developer.arm.com/documentation/den0042/a/Unified-Assembly-Language-Instructions/Saturating-arithmetic/Saturated-math-instructions)
+
+- 

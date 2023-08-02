@@ -1,3 +1,21 @@
+# 资料集合
+
+[STM32分步指南入门(Getting started with STM32: STM32 step-by-step)](https://wiki.stmicroelectronics.cn/stm32mcu/wiki/STM32StepByStep:Getting_started_with_STM32_:_STM32_step_by_step)
+
+# STM32芯片命名规则
+
+ref:
+
+[Understanding STM32 Naming Conventions](https://www.digikey.com/en/maker/blogs/2020/understanding-stm32-naming-conventions)
+
+[STM32命名规则解读](https://zhuanlan.zhihu.com/p/266122494)
+
+# 查询程序大小
+
+[ARM Program Size - ZI data](https://community.arm.com/support-forums/f/keil-forum/20991/arm-program-size---zi-data)
+
+[How size of hex file is calculated?](https://community.arm.com/support-forums/f/keil-forum/34036/how-size-of-hex-file-is-calculated)
+
 # 时钟
 
 总共5个时钟源：HSI，HSE，LSI，LSE，PLL
@@ -20,6 +38,41 @@ http://www.openedv.com/posts/list/32730.htm
 
 找各种引脚复用等，请参考datasheet（数据手册）。
 
+
+
+# 中断系统
+
+## 一、优先级的配置
+
+**配置中断优先级分组**：修改`main.c`里的初始化函数`HAL_Init()`里的中断优先级分组配置函数代码：
+
+```c
+HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_X);
+```
+
+**确定相应优先级和抢占优先级**的库函数：
+
+```c
+void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t SubPriority)
+```
+
+## 二、定时器中断
+
+### 2.1 定时器时钟
+
+> 计数器时钟可由下列时钟源提供： 
+>
+> - 内部时钟 (CK_INT) 
+> - 外部时钟模式 1：外部输入引脚 (TIx) 
+> - 外部时钟模式 2：外部触发输入 (ETR)
+> - 外部触发输入 (ITRx)
+
+我们使用**内部时钟**，此时通用定时器TIM2 ~ 5的时钟来源于APB1，当APB1时钟分频数为1时，二者时钟相等；当然，更常见的情况是**APB1的时钟分频不为1，此时定时器的时钟是APB1的2倍**。
+
+TIM9 ~ 14的时钟来源为APB2。
+
+
+
 # LCD
 RGB LCD和MCU LCD是不一样的。
 
@@ -35,7 +88,7 @@ RGB接口方式：显示数据不写入DDRAM，直接写屏，速度快，常用
 
 RGB LCD的id：
 
-> STM32F7开发指南-HAL库版本：p391:
+> 《STM32F7开发指南-HAL库版本》：p391:
 >
 > ...而LCD_R7/G7/B7则用来设置LCD的ID，由于RGB LCD没有读写寄存器，也就没有所谓的ID，这里我们通过在模块上面，控制R7/G7/B7的上/下拉，来定义LCD模块的ID，帮助MCU判断当前LCD的分辨率和相关参数，以提高程序兼容性。
 
@@ -106,7 +159,7 @@ FMC_BWTRx: 闪写时序寄存器
 >
 > 电容触摸屏一般都需要一个驱动IC来检测电容触摸，且一般都是使用IIC接口输出触摸数据。....本例程除了CPLD方案的V1版本7寸屏幕模块不支持以外，其他所有Alientek的LCD模块都支持。
 
-我们使用的是电容屏幕，使用GT9147集成芯片驱动来检测电容触摸。
+我们使用的是电容屏幕，使用GT9147集成芯片驱动来检测电容触摸。**电容屏幕无需校准。**
 
 **其他补充**：FT5206和FT5426的驱动代码是一模一样的，在正点原子的例程里它们共用一个`.c`文件。
 
@@ -468,19 +521,23 @@ void GUI_X_Config(void) {
 - [x] EEPROM用来干啥 --- 用于存储一些掉电不能丢失的重要数据，比如系统设置的一些参数/触摸屏的校准数据等等。
 - [x] 是否需要电压测试端？
 
-- [ ] BOOT0和BOOT1
+- [x] BOOT0和BOOT1
 
-- [ ] 中文参考手册：VREF– 如果可用（**取决于封装**），则必须将其连接到 VSSA。？
+- [x] 中文参考手册：VREF– 如果可用（**取决于封装**），则必须将其连接到 VSSA。？
 
-- [ ] 模拟地和数字地
+- [x] 模拟地和数字地
 
 > 这里还需要说明一下ADC的参考电压，阿波罗STM32F7开发板使用的是STM32F7IGT6，该芯片只有Vref+参考电压引脚，输入范围为：1.8 ~ VDDA。开发板通过P5端口，来设置Vref+的参考电压，默认的是我们通过跳线帽将ref+接到3.3V,参考电压就是3.3V。
 
 - [x] 没有晶振---有，正点原子的开发板的HSE接的是25MHz外部晶振
 
-- [ ] 是否需要USB供电？
+- [x] 是否需要USB供电？
 
 ## 一、基础器件选型
+
+### 芯片库存/购买渠道查询
+
+[octopart](https://octopart.com/stm32f767igt6-stmicroelectronics-74146081)
 
 ### 电容
 
@@ -494,9 +551,15 @@ void GUI_X_Config(void) {
 
 ## 二、电源部分
 
-### TODO：
-
 - 3.3v power switch 的 VUSB
+
+### VDDA and VSSA
+
+[VDDA/VSSA connection to VDD/VSS](https://community.st.com/t5/stm32-mcu-products/vdda-vssa-connection-to-vdd-vss/td-p/341799#:~:text=No%20-%20VDDA%20can%20be%20any%20voltage%20you,diode%20helps%20make%20sure%20this%20isn%27t%20the%20case.)
+
+- > "It is recommended to power VDD and VDDA from the same source. A maximum difference of 300 mV between VDD and VDDA can be tolerated during power-up and power-down operation."
+
+  > 1. *VDDA and VSSA must be connected to VDD and VSS, respectively.*
 
 ### 名词解释
 
@@ -575,7 +638,135 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
 ## 五、RGB LCD
 
+### FPC接口
+
 接口是40+2脚，使用RGB565颜色格式。
+
+### 软件修改
+
+在 `ltdc.c`里的 `void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc)` 里配置相应的IO口LTDC复用。
+
+### IO口配置
+
+- IGT6 (176 pins)：
+
+  - |   信号线   |             对应I/O             |
+    | :--------: | :-----------------------------: |
+    |  LCD_CLK   |               PG7               |
+    | LCD_HSYNC  |              PI10               |
+    | LCD_VSYNC  |               PI9               |
+    |   LCD_DE   |              PF10               |
+    |   LCD_BL   |               PB5               |
+    | LCD_R[7:3] |   PG6、PH12、PH11、PH10、PH9    |
+    | LCD_G[7:2] | PI2、PI1、PI0、PH15、PH14、PH13 |
+    | LCD_B[7:3] |    PI7、PI6、PI5、PI4、PG11     |
+
+    
+
+- ZGT6 (144 pins)：
+
+    - |       信号线       |                           可用I/O                            |
+      | :----------------: | :----------------------------------------------------------: |
+      |      LCD_CLK       |                      PE14(67), PG7(92)                       |
+      |     LCD_HSYNC      |                           PC6(96)                            |
+      |     LCD_VSYNC      |                           PA4(40)                            |
+      |       LCD_DE       |                           PF10(22)                           |
+      | LCD_BL（普通GPIO） |                         （普通GPIO）                         |
+      |     LCD_R[7:5]     | PE15(68), PG6(91) / PB1(47). PA8(100) / PC0(26), PA9(101), PA12(104) |
+      |     LCD_R[4:3]     |                 PA5(41)，PA11(103) / PB0(46)                 |
+      |     LCD_G[7:5]     |       PG8(93)、PD3(117)、PB5(135) / PC7(97) / PB11(70)       |
+      |     LCD_G[4:2]     |     PB10(69) / PE11(63) , PC9(99) , PG10(125) / PA6(42)      |
+      |     LCD_B[7:3]     | PB9(140) / PB8(139) / PA3(37) / PE12(65), PA10(102), PG12(127) / PD10(79), PA8(100), PG11(126) |
+
+
+
+## 六、MCU LCD
+
+21个IO口。
+
+### 软件修改
+
+- 在 `tftlcd.c`里的 `void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram)` 里配置相应的IO口MCU LCD复用。
+
+- IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配置。
+
+- 注意`sdram.c` 里的 `void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef *hsdram)` 里配置FMC所用到的引脚，虽然好像用不到
+
+### IO口配置
+
+- IGT6 (176 pins)：
+
+  > 可参考正点原子开发手册p350。
+  
+  |    信号线     |       对应I/O        |
+  | :-----------: | :------------------: |
+  |  FMC_D0 ~ D3  | PD14、PD15、PD0、PD1 |
+  | FMC_D4 ~ D12  |      PE7 ~ PE15      |
+  | FMC_D13 ~ D15 |    PD8、PD9、PD10    |
+  |    LCD_BL     |         PB5          |
+  |    LCD_CS     |         PD7          |
+  |    LCD_RS     |         PD13         |
+  |    LCD_WR     |         PD5          |
+  |    LCD_RD     |         PD4          |
+
+- FMC引脚：
+
+  | 信号线  | 对应I/O |
+  | :-----: | :-----: |
+  | FMC_NE1 |   PD7   |
+  | FMC_A18 |  PD13   |
+  | FMC_NWE |   PD5   |
+  | FMC_NOE |   PD4   |
+
+  和上面的LCD_XX是对应的。
+  
+
+​		
+
+
+
+- ZGT6 (144 pins)：
+
+
+
+
+## 七、触摸引脚
+
+使用的芯片是GT9147。
+
+总共5根线。
+
+### 软件修改
+
+需要修改的地方：
+
+`touch.c` 里的 `u8 TP_Init(void)`，注意电阻屏幕支持可能需要删除
+
+`touch.h` 里的宏定义
+
+`gt9147.c` 的 `u8 GT9147_Init(void)` 里对PH7和PI8的操作
+
+`ctiic.c` 和 `ctiic.h` 里面的函数和宏定义
+
+**这些端口全部配置为GPIO，不需要复用！**
+
+### IO口配置
+
+- IGT6 (176 pins)：
+
+  > 参考正点原子开发手册p603
+
+  | 信号线 | 对应I/O |
+  | :----: | :-----: |
+  | T_MOSI |   PI3   |
+  | T_MISO |   PG3   |
+  | T_SCK  |   PH6   |
+  |  T_CS  |   PI8   |
+  | T_PEN  |   PH7   |
+
+  
+
+- ZGT6 (144 pins)：全是普通GPIO，可以随意
 
 # PCB绘制
 
@@ -595,9 +786,11 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
 贴片IC类：3~4档
 
+## 单片机焊接教程
 
+[51单片机焊接调试说明](https://max.book118.com/html/2017/0614/115162504.shtm)
 
-
+[硬件电路焊接----整体焊接布局介绍--海创电子](https://www.bilibili.com/video/BV1XJ41157Sh/?spm_id_from=333.788.recommend_more_video.3)
 
 
 
@@ -614,7 +807,7 @@ Since widgets are actually windows with enhanced functionality, it is required t
 
 **Warning: The end user must not use the function WM_GetUserData() or WM_SetUserData() with a widget of a custom type as it is implemented using this guide, since the user would either overwrite widget specific data, or not retrieve the expected data.**
 
-> 在主函数中我们主要完成了外设的初始化和创建 start_task 任务，我们注意到这里并没有初 始化定时器 3 和定时器 4。在无操作系统中我们使用定时器 3 来为 STemWin 提供系统时钟，使用定 时器 4 来定时处理触摸事件。在本章中我们移植有 UCOS III 操作系统，我们使用 UCOS III 系 统来为 STemWin 提供系统时钟，对于触摸事件的处理我们可以建立一个任务来完成，因此这里 就不需要使用定时器了。
+> 在主函数中我们主要完成了外设的初始化和创建 start_task 任务，我们注意到这里并没有初 始化定时器 3 和定时器 4。在无操作系统中我们使用定时器 3 来为 STemWin 提供系统时钟，使用定时器 4 来定时处理触摸事件。在本章中我们移植有 UCOS III 操作系统，我们使用 UCOS III 系 统来为 STemWin 提供系统时钟，对于触摸事件的处理我们可以建立一个任务来完成，因此这里 就不需要使用定时器了。
 
 # ADC
 
@@ -623,6 +816,20 @@ Since widgets are actually windows with enhanced functionality, it is required t
 可参见芯片自己的datasheet。不过正点原子的指南都列出来了，直接参考配置即可：
 
 <img src="..\Docs\Images\ADC_Pin.png" style="zoom:75%;" />
+
+我们使用ADC3_IN4（PF6）和ADC3_IN5（PF7）。
+
+# DMA
+
+stm32f767有两个DMA控制器，每个控制器各管理8个数据流，数据流的通道之间使用仲裁器来处理DMA请求之间的优先级。
+
+**使用DMA2**：
+
+<img src=".\Images\DMA2_Mapping.png" style="zoom:95%;" />
+
+ADC3是数据流0或1，通道2。
+
+
 
 # 专用名词
 
@@ -653,4 +860,4 @@ Since widgets are actually windows with enhanced functionality, it is required t
 
   source: [Saturated math instructions](https://developer.arm.com/documentation/den0042/a/Unified-Assembly-Language-Instructions/Saturating-arithmetic/Saturated-math-instructions)
 
-- 
+- [STM32库标识符命名规则](https://community.st.com/t5/stm32-mcu-products/where-i-can-find-the-stm32-naming-convention-in-order-to/m-p/339607)

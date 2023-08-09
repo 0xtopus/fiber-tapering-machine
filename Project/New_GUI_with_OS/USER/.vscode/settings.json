@@ -3,6 +3,8 @@
         "timer.h": "c",
         "adc.h": "c",
         "ltdc.h": "c",
-        "touch.h": "c"
+        "touch.h": "c",
+        "ctiic.h": "c",
+        "tftlcd.h": "c"
     }
 }

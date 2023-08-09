@@ -115,13 +115,14 @@ u8 GT9147_Init(void)
     
     __HAL_RCC_GPIOH_CLK_ENABLE();			//开启GPIOH时钟
     __HAL_RCC_GPIOI_CLK_ENABLE();			//开启GPIOI时钟
+    __HAL_RCC_GPIOD_CLK_ENABLE();			//!开启GPIOD时钟
                 
-    //PH7
+    //!PD7
     GPIO_Initure.Pin=GPIO_PIN_7;            //PH7
     GPIO_Initure.Mode=GPIO_MODE_INPUT;      //输入
     GPIO_Initure.Pull=GPIO_PULLUP;          //上拉
     GPIO_Initure.Speed=GPIO_SPEED_HIGH;     //高速
-    HAL_GPIO_Init(GPIOH,&GPIO_Initure);     //初始化
+    HAL_GPIO_Init(GPIOD,&GPIO_Initure);     //初始化
             
     //PI8
     GPIO_Initure.Pin=GPIO_PIN_8;            //PI8
@@ -132,11 +133,11 @@ u8 GT9147_Init(void)
 	delay_ms(10);
  	GT_RST(1);				//释放复位		    
 	delay_ms(10); 
-    GPIO_Initure.Pin=GPIO_PIN_7;            //PH7
+    GPIO_Initure.Pin=GPIO_PIN_7;            //!PH7
     GPIO_Initure.Mode=GPIO_MODE_INPUT;      //输入
     GPIO_Initure.Pull=GPIO_NOPULL;          //不带上下拉，浮空输入
     GPIO_Initure.Speed=GPIO_SPEED_HIGH;     //高速
-    HAL_GPIO_Init(GPIOH,&GPIO_Initure);     //初始化
+    HAL_GPIO_Init(GPIOD,&GPIO_Initure);     //!初始化
 	delay_ms(100);  
 	GT9147_RD_Reg(GT_PID_REG,temp,4);//读取产品ID
 	temp[4]=0;

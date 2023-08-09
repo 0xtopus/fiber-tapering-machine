@@ -496,9 +496,10 @@ void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram)
 	__HAL_RCC_FMC_CLK_ENABLE();				//使能FMC时钟
 	__HAL_RCC_GPIOD_CLK_ENABLE();			//使能GPIOD时钟
 	__HAL_RCC_GPIOE_CLK_ENABLE();			//使能GPIOE时钟
+	__HAL_RCC_GPIOC_CLK_ENABLE();			//!使能GPIOC时钟
 	
-	//初始化PD0,1,4,5,7,8,9,10,13,14,15
-	GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_7|GPIO_PIN_8|\
+	//!初始化PD0,1,4,5,7,8,9,10,13,14,15    no 7
+	GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_8|\
                      GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
 	GPIO_Initure.Mode=GPIO_MODE_AF_PP; 		//复用
 	GPIO_Initure.Pull=GPIO_PULLUP;			//上拉
@@ -510,6 +511,10 @@ void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram)
 	GPIO_Initure.Pin=GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|\
                      GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
 	HAL_GPIO_Init(GPIOE,&GPIO_Initure);
+
+    GPIO_Initure.Alternate=GPIO_AF9_FMC;	//!复用为FMC
+    GPIO_Initure.Pin = GPIO_PIN_7;
+    HAL_GPIO_Init(GPIOC,&GPIO_Initure);
 }
         
 //初始化lcd
@@ -528,7 +533,7 @@ void TFTLCD_Init(void)
     else
     {    
 		__HAL_RCC_GPIOB_CLK_ENABLE();			//开启GPIOB时钟
-		GPIO_Initure.Pin=GPIO_PIN_5;            //PB5,背光控制
+		GPIO_Initure.Pin=GPIO_PIN_6;            //!PB5,背光控制
 		GPIO_Initure.Mode=GPIO_MODE_OUTPUT_PP;  //推挽输出
 		GPIO_Initure.Pull=GPIO_PULLUP;          //上拉
 		GPIO_Initure.Speed=GPIO_SPEED_HIGH;     //高速

@@ -19,7 +19,8 @@
 //V1.2  20170606 
 //新增10.1寸RGB屏的支持
 //////////////////////////////////////////////////////////////////////////////////	 
-#define LCD_LED(n)              (n?HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_RESET))   //LCD背光PD13              //LCD背光PD13
+//!PB5-->PB6
+#define LCD_LED(n)              (n?HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_RESET))   //LCD背光PD13              //LCD背光PD13
 
 //LCD LTDC重要参数集
 typedef struct  

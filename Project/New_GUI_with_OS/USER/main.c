@@ -90,13 +90,13 @@ int main(void)
     uart_init(115200);               // 串口初始化
     KEY_Init();                      // 按键初始化
     LED_Init();                      // 初始化LED
-    //SDRAM_Init();                    // SDRAM初始化
+    SDRAM_Init();                    // SDRAM初始化
     TFTLCD_Init();                   // 初始化LCD
     TP_Init();                       // 触摸屏初始化
 
     MY_ADC_Init();       // 初始化ADC
     my_mem_init(SRAMIN); // 初始化内部内存池
-    // my_mem_init(SRAMEX);		    //初始化外部内存池
+    my_mem_init(SRAMEX);		    //初始化外部内存池
     my_mem_init(SRAMDTCM); // 初始化DTCM内存池
 
     OSInit(&err);        // 初始化UCOSIII

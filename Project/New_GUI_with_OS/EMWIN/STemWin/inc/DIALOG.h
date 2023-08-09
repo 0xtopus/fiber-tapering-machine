@@ -93,7 +93,9 @@ void      WINDOW_SetDefaultBkColor(GUI_COLOR Color);
 int       WINDOW_SetUserData      (WM_HWIN hObj, const void * pSrc, int NumBytes);
 
 void WINDOW_Callback(WM_MESSAGE * pMsg);
-
+WM_HWIN Createsingle_motor(void);
+WM_HWIN Createdual_motor(void);
+WM_HWIN CreateWindow1(void);
 #if defined(__cplusplus)
   }
 #endif

@@ -211,7 +211,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         
         if (!adc_flag) // ADC采样未完成
         {
-            adc_buff[2*count] = ((float) Get_Adc(ADC_CHANNEL_4));
+            adc_buff[2*count] = ((float) Get_Adc(ADC_CHANNEL_4)) - 2048;
             // printf("\r\nususu:%f\r\n", AdcBuff[2*count]);
             adc_buff[2*count+1] = 0;
             count++;

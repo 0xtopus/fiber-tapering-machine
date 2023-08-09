@@ -51,8 +51,8 @@ extern u32  BACK_COLOR; //背景颜色.默认为白色
 
 //////////////////////////////////////////////////////////////////////////////////	 
 //-----------------MCU屏 LCD端口定义---------------- 
-//LCD背光	PB5	
-#define LCD_LED(n) (n?HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_RESET)) 	    
+//!LCD背光	PB5	-->6
+#define LCD_LED(n) (n?HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6,GPIO_PIN_RESET)) 	    
 //LCD地址结构体
 typedef struct
 {

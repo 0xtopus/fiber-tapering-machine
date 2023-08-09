@@ -4,6 +4,8 @@
 
 # STM32芯片命名规则
 
+可见数据手册datasheet的第八章：《Ordering Information》
+
 ref:
 
 [Understanding STM32 Naming Conventions](https://www.digikey.com/en/maker/blogs/2020/understanding-stm32-naming-conventions)
@@ -94,6 +96,8 @@ RGB LCD的id：
 
 ## Datasheet 
 <a href="https://max.book118.com/html/2020/0724/5132043242002321.shtm">Alientek 4.3' TFTLCD</a>
+
+4.3寸 ：62.25mm*117.5mm 见[资料](http://47.111.11.73/docs/modules/lcd/4.3-TFT%20LCD-800480.html)
 
 ## 80并口的信号线
 CS：片选信号
@@ -508,10 +512,7 @@ void GUI_X_Config(void) {
 
 [Getting started with STM32F7 Series MCU hardware development(AN4661)](https://www.st.com/resource/en/application_note/dm00164549-getting-started-with-stm32f7-series-mcu-hardware-development-stmicroelectronics.pdf)
 
-
-
-- 最小系统板：minimum system board
-- 
+[电路板铺地时PCB 地加强孔需不需要打](https://zhidao.baidu.com/question/223418452.html)
 
 - P2576电压转换芯片
 - [正点原子STM32F429核心板的插座型号](https://blog.csdn.net/youngwah292/article/details/119495119#:~:text=%E8%BF%99%E4%B8%A4%E4%B8%AA%E6%8F%92%E5%BA%A7%E5%9E%8B%E5%8F%B7%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%20%E5%9C%A8%E6%A0%B8%E5%BF%83%E6%9D%BF%E4%B8%8A%E5%AE%89%E8%A3%85%E7%9A%84%E8%BF%99%E4%B8%A4%E4%B8%AA%E6%8F%92%E5%BA%A7%EF%BC%8C%E6%98%AF3710F%E6%8F%92%E5%BA%A7%EF%BC%88%E5%85%AC%E5%A4%B4%EF%BC%89%E3%80%82,%E9%82%A3%E4%B9%88%E4%B8%8E%E4%B9%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%98%AF3710F%E6%8F%92%E5%BA%A7%EF%BC%88%E6%AF%8D%E5%BA%A7%EF%BC%89%EF%BC%8C%E5%A6%82%E4%B8%8B%E5%9B%BE%E6%89%80%E7%A4%BA%E3%80%82%20%E5%AE%83%E6%9C%8960%E4%B8%AA%E5%BC%95%E8%84%9A%EF%BC%8C%E4%B8%A4%E4%BE%A7%E5%90%8430%E4%B8%AA%E3%80%82%20%E6%AD%A3%E7%82%B9%E5%8E%9F%E5%AD%90%E5%AE%98%E7%BD%91%E6%9C%89%E8%BF%99%E7%A7%8D%E8%B4%AD%E4%B9%B0%E8%BF%9E%E6%8E%A5%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%90%9C%E7%B4%A2%E2%80%9C3710F%E6%9D%BF%E5%AF%B9%E6%9D%BF%E8%BF%9E%E6%8E%A5%E5%99%A8%E2%80%9D%E6%9F%A5%E6%89%BE%E8%B4%AD%E4%B9%B0%E3%80%82)
@@ -646,7 +647,20 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
 在 `ltdc.c`里的 `void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc)` 里配置相应的IO口LTDC复用。
 
+IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配置。还有`tftlcd.h` 和 `ltdc.h`里的宏定义。
+
 ### IO口配置
+
+<p style="color:red;font-weight:bold">注意：当修改GPIO时，您需要注意以下三点：
+<ol>
+	<li>开启对应GPIO的时钟；</li>
+    <li>选择对应的复用！</li>
+    <li>配置对应的IO端口</li>
+</ol>
+</p>
+
+
+
 
 - IGT6 (176 pins)：
 
@@ -667,16 +681,16 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
     - |       信号线       |                           可用I/O                            |
       | :----------------: | :----------------------------------------------------------: |
-      |      LCD_CLK       |                      PE14(67), PG7(92)                       |
-      |     LCD_HSYNC      |                           PC6(96)                            |
-      |     LCD_VSYNC      |                           PA4(40)                            |
-      |       LCD_DE       |                           PF10(22)                           |
-      | LCD_BL（普通GPIO） |                         （普通GPIO）                         |
-      |     LCD_R[7:5]     | PE15(68), PG6(91) / PB1(47). PA8(100) / PC0(26), PA9(101), PA12(104) |
-      |     LCD_R[4:3]     |                 PA5(41)，PA11(103) / PB0(46)                 |
-      |     LCD_G[7:5]     |       PG8(93)、PD3(117)、PB5(135) / PC7(97) / PB11(70)       |
-      |     LCD_G[4:2]     |     PB10(69) / PE11(63) , PC9(99) , PG10(125) / PA6(42)      |
-      |     LCD_B[7:3]     | PB9(140) / PB8(139) / PA3(37) / PE12(65), PA10(102), PG12(127) / PD10(79), PA8(100), PG11(126) |
+      |      LCD_CLK       |         <del>PE14(67) （FMC_D11）</del>，**PG7(92)**         |
+      |     LCD_HSYNC      |                         **PC6(96)**                          |
+      |     LCD_VSYNC      |                         **PA4(40)**                          |
+      |       LCD_DE       |        <del>PE13(66) （FMC_D10）</del>， **PF10(22)**        |
+      | LCD_BL（普通GPIO） |                  BL是PG3（88）（普通GPIO）                   |
+      |     LCD_R[7:5]     | <del>PE15(68)</del>, **PG6(91)** / PB1(47). <u>PA8(100)</u> / PC0(26), <u>PA9(101)</u>, PA12(104) |
+      |     LCD_R[4:3]     |           PA5(41)，<u>PA11(103)</u> / **PB0(46)**            |
+      |     LCD_G[7:5]     | <del>PG8(93)</del>、PD3(117)、<u>PB5(135)</u> / **PC7(97)** / **PB11(70)** |
+      |     LCD_G[4:2]     | **PB10(69)** / PE11(63) , PC9(99) , <u>PG10(125)</u> / **PA6(42)** |
+      |     LCD_B[7:3]     | **PB9(140) / PB8(139)** / **PA3(37)** / <del>PE12(65)</del>, PA10(102), <u>PG12(127)</u> / <del>PD10(79)</del>, PA8(100), **PG11(126)** |
 
 
 
@@ -688,28 +702,36 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
 - 在 `tftlcd.c`里的 `void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram)` 里配置相应的IO口MCU LCD复用。
 
-- IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配置。
+- IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配置。还有`tftlcd.h` 和 `ltdc.h`里的宏定义。
 
 - 注意`sdram.c` 里的 `void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef *hsdram)` 里配置FMC所用到的引脚，虽然好像用不到
 
 ### IO口配置
 
+<p style="color:red;font-weight:bold">注意：当修改GPIO时，您需要注意以下三点：
+<ol>
+	<li>开启对应GPIO的时钟；</li>
+    <li>选择对应的复用！</li>
+    <li>配置对应的IO端口</li>
+</ol>
+</p>
+
 - IGT6 (176 pins)：
 
   > 可参考正点原子开发手册p350。
   
-  |    信号线     |       对应I/O        |
-  | :-----------: | :------------------: |
-  |  FMC_D0 ~ D3  | PD14、PD15、PD0、PD1 |
-  | FMC_D4 ~ D12  |      PE7 ~ PE15      |
-  | FMC_D13 ~ D15 |    PD8、PD9、PD10    |
-  |    LCD_BL     |         PB5          |
-  |    LCD_CS     |         PD7          |
-  |    LCD_RS     |         PD13         |
-  |    LCD_WR     |         PD5          |
-  |    LCD_RD     |         PD4          |
+  |       信号线       |       对应I/O        |
+  | :----------------: | :------------------: |
+  |    FMC_D0 ~ D3     | PD14、PD15、PD0、PD1 |
+  |    FMC_D4 ~ D12    |      PE7 ~ PE15      |
+  |   FMC_D13 ~ D15    |    PD8、PD9、PD10    |
+  | LCD_BL（普通GPIO） |         PB5          |
+  |       LCD_CS       |         PD7          |
+  |       LCD_RS       |         PD13         |
+  |       LCD_WR       |         PD5          |
+  |       LCD_RD       |         PD4          |
 
-- FMC引脚：
+- FMC引脚（**和上面的LCD_XX是对应的。**）：
 
   | 信号线  | 对应I/O |
   | :-----: | :-----: |
@@ -718,14 +740,24 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
   | FMC_NWE |   PD5   |
   | FMC_NOE |   PD4   |
 
-  和上面的LCD_XX是对应的。
-  
 
 ​		
 
 
 
 - ZGT6 (144 pins)：
+  |       信号线       |                          对应I/O                          |
+  | :----------------: | :-------------------------------------------------------: |
+  |    FMC_D0 ~ D3     | **PD14(85)** / **PD15(86)** / **PD0(114)** / **PD1(115)** |
+  |    FMC_D4 ~ D6     |          **PE7(58)** / **PE8(59)** / **PE9(60)**          |
+  |    FMC_D7 ~ D10    | **PE10(63)** / **PE11(64)** / **PE12(65)** / **PE13(66)** |
+  |   FMC_D11 ~ D12    |                **PE14(67)** / **PE15(68)**                |
+  |   FMC_D13 ~ D15    |         **PD8(77)** / **PD9(78)** / **PD10(79)**          |
+  | LCD_BL（普通GPIO） |                       BL是PG3（88）                       |
+  |  LCD_CS (FMC_NE1)  |             <del>PC7(97)</del>, **PD7(123)**              |
+  |  LCD_RS (FMC_A18)  |                       **PD13(82)**                        |
+  |  LCD_WR (FMC_NWE)  |                       **PD5(119)**                        |
+  |  LCD_RD (FMC_NOE)  |                       **PD4(118)**                        |
 
 
 
@@ -746,11 +778,21 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
 `gt9147.c` 的 `u8 GT9147_Init(void)` 里对PH7和PI8的操作
 
-`ctiic.c` 和 `ctiic.h` 里面的函数和宏定义
+`ctiic.c`  里面的函数：`void CT_IIC_Init(void)`
+
+`ctiic.h` 的宏定义
 
 **这些端口全部配置为GPIO，不需要复用！**
 
 ### IO口配置
+
+<p style="color:red;font-weight:bold">注意：当修改GPIO时，您需要注意以下三点：
+<ol>
+	<li>开启对应GPIO的时钟；</li>
+    <li>选择对应的复用！</li>
+    <li>配置对应的IO端口</li>
+</ol>
+</p>
 
 - IGT6 (176 pins)：
 
@@ -768,11 +810,84 @@ EMI：[How to identify or calculate the electromagnetic interference (EMI) contr
 
 - ZGT6 (144 pins)：全是普通GPIO，可以随意
 
+| 信号线 |  对应I/O   |
+| :----: | :--------: |
+| T_MOSI | PC8（98）  |
+| T_MISO | PB13（74） |
+| T_SCK  | PB12（73） |
+|  T_CS  | PC9（99）  |
+| T_PEN  | PD11（80） |
+
+BL是PG3（88）
+
+## 八、SDRAM
+
+<p style="color:red;font-weight:bold">注意：当修改GPIO时，您需要注意以下三点：
+<ol>
+	<li>开启对应GPIO的时钟；</li>
+    <li>选择对应的复用！</li>
+    <li>配置对应的IO端口</li>
+</ol>
+</p>
+
+- ZGT6 (144 pins)：
+
+  |    信号线     |                          对应I/O                          |
+  | :-----------: | :-------------------------------------------------------: |
+  |  FMC_D0 ~ D3  | **PD14(85)** / **PD15(86)** / **PD0(114)** / **PD1(115)** |
+  |  FMC_D4 ~ D6  |          **PE7(58)** / **PE8(59)** / **PE9(60)**          |
+  | FMC_D7 ~ D10  |       **PE10(63) / PE11(64) / PE12(65) / PE13(66)**       |
+  | FMC_D11 ~ D12 |                  **PE14(67) / PE15(68)**                  |
+  | FMC_D13 ~ D15 |             **PD8(77) / PD9(78) / PD10(79)**              |
+  |   FMC_NBL0    |                       **PE0(141)**                        |
+  |   FMC_NBL1    |                       **PE1(142)**                        |
+  |   FMC_SDNWE   |                PC0(26), **<u>PA7(43)</u>**                |
+  |  FMC_SDNCAS   |                       **PG15(132)**                       |
+  |   FMC_SDCLK   |                        **PG8(93)**                        |
+  |  FMC_SDNRAS   |                       **PF11(49)**                        |
+  |  FMC_SDCKE0   |                PC3(29), **<u>PC5(45)</u>**                |
+  |   FMC_SDNE0   |                PC2(28), **<u>PC4(44)</u>**                |
+  |    FMC_BA0    |                        **PG4(89)**                        |
+  |    FMC_BA1    |                        **PG5(90)**                        |
+  |  **FMC_A10**  |                        **PG0(56)**                        |
+  |  FMC_A0 ~ A2  |              **PF0(10) / PF1(11) / PF2(12)**              |
+  |  FMC_A3 ~ A5  |              **PF3(13) / PF4(14) / PF5(15)**              |
+  |  FMC_A6 ~ A9  |       **PF12(50) / PF13(53) / PF14(54) / PF15(55)**       |
+  | FMC_A10 ~ A12 |             **PG0 (56) / PG1 (57) / PG2(87)**             |
+
+
+
+## 九、ADC和PWM
+
+1 2 3 4 5 **7 8 9**
+
+4 5 TIM9_CH1,CH2
+
+18 19 20 21: ADC3. TIM10, 11 12, 13_CH1
+
+113,112,111, 116, 117 122, 129,128, 132
+
+80, 81
+
+41: TIM2_CH1, ADC, DAC
+
+**47**: TIM3_CH4
+
+48
+
+26, 27, 28, 29 ADC
+
 # PCB绘制
 
+[电路板铺地时PCB 地加强孔需不需要打](https://zhidao.baidu.com/question/223418452.html)
 
+[过孔可以打在贴片元件的焊盘上吗](https://www.zhihu.com/question/53848637/answer/2537010208)
 
 <img src=".\Images\敷铜注意.png" style="zoom:75%;" />
+
+[电路设计常用接地方法](https://zhuanlan.zhihu.com/p/549690615)
+
+
 
 # 焊接与调试
 
@@ -829,7 +944,41 @@ stm32f767有两个DMA控制器，每个控制器各管理8个数据流，数据�
 
 ADC3是数据流0或1，通道2。
 
+## 配置过程：
 
+可以参考《Description of STM32F7 HAL and low-layer drivers - User manual》第7.2节 ADC Firmware driver API description，以及野火的例程里的例子进行配置。<u>注意：如果你开启了L1缓存，那么可能会无法读出正确的采集值，详情见<a href="#DMA出问题？注意一级缓存">这里</a></u>。
+
+需要注意的点：
+
+1. 在`HAL_ADC_MspInit()`里配置底层资源：
+
+   - 开启GPIO、ADC和DMA对应的时钟；
+
+   - 配置GPIO和DMA
+     - 注意DMA的通道，数据流，传输模式和外设和存储的递增模式等等。
+
+   - 使用：`HAL_DMA_Start()`来关联<u>DMA</u>和<u>需要传输的ADC数据寄存器</u>以及<u>用来存储数据的内存地址</u>。（用`__HAL_LINKDMA()`也行，但是不够灵活，我还是喜欢使用前者）
+
+2. 配置ADC初始化函数：
+   - ADC的实例(Instance)，是否连续转换，采样周期，触发方式，DMA连续请求，对齐方式等等。
+   - 配置ADC的通道。
+   - 使用`HAL_ADC_Start_DMA(&ADC1_Handler, (uint32_t *)AdcBuff, 1)`开始采样。
+
+
+
+## DMA出问题？注意一级缓存！
+
+正点原子的例程里是默认在`main.c`里开启一级缓存的，这可能导致DMA数据一直为0！
+
+DMA不起效果：有可能是L1-Cache的问题，见：[STM32H7 ADC with DMA reading only zeros (using HAL and FreeRTOS)](https://electronics.stackexchange.com/questions/581003/stm32h7-adc-with-dma-reading-only-zeros-using-hal-and-freertos)
+
+> “Make sure that you have [Cortex M7 L1 data cache](https://www.st.com/resource/en/application_note/an4839-level-1-cache-on-stm32f7-series-and-stm32h7-series-stmicroelectronics.pdf) disabled on the DMA area of memory (or invalidate the cache prior to reading). You can also globally disable it (at a performance cost) with:
+>
+> void SCB_DisableDCache (void);
+>
+> The DMA writes to the memory, not to the cache so cache coherency is not maintained.
+>
+> n.b. **<u>declaring the buffer as volatile is not sufficient</u>**.”
 
 # 专用名词
 
@@ -861,3 +1010,7 @@ ADC3是数据流0或1，通道2。
   source: [Saturated math instructions](https://developer.arm.com/documentation/den0042/a/Unified-Assembly-Language-Instructions/Saturating-arithmetic/Saturated-math-instructions)
 
 - [STM32库标识符命名规则](https://community.st.com/t5/stm32-mcu-products/where-i-can-find-the-stm32-naming-convention-in-order-to/m-p/339607)
+
+- 最小系统板：minimum system board
+
+- 

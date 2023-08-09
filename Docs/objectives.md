@@ -1,26 +1,165 @@
+- 程序构想
+  - 自动来不及？
+  - 在已有手动基础上，加入示波模块
+- 如果无法调试，自动？
+- 采样电路
+- 光耦
+
+
+
+
+
 # 目标6
 
+问题：
 
+- 电源10KΩ电阻，计算出来FB=0.83，原来：0.80
+- 
 
 ## 目标6.1
 
-- [ ] 由于芯片突然没货，将IGT6换成ZGT6（176引脚 --> 144引脚）
-- [ ] 测试修改后的引脚程序！
-- [ ] 重绘原理图和PCB
+- [x] 由于芯片突然没货，将IGT6换成ZGT6（176引脚 --> 144引脚）
+- [x] 测试修改后的引脚程序！
+- [x] 重绘原理图和PCB
 
   - 将所有需要用到引脚映射找出来，根据PCB好画的原则选择
-- [ ] 在程序中查看如何修改引脚映射
+  - 补齐剩下未连接的线（见原理图）BL、触摸屏
+  - USART1：136，137
+  - 触摸屏引脚
+  - 背光引脚
+- [x] 在程序中查看如何修改引脚映射
 
 **需要修改的外设模块有：**
 
-  - [ ] 拉锥机的外设引脚
+  - [x] 拉锥机的外设引脚
   - [x] RGB LCD引脚
-  - [ ] MCU LCD引脚
-  - [ ] USART引脚
-  - [ ] 保证引出IO口尽可能多
-  - [ ] LED
+  - [x] MCU LCD引脚
+  - [x] USART引脚
+  - [x] 保证引出IO口尽可能多
+  - [x] LED
   - [ ] 蜂鸣器
-  - [ ] 测试点
+  - [x] 测试点
+
+### 新控制逻辑：
+
+左路电机：
+
+Timer9控制，PE5对应通道1，**远离中心拉锥**，对应`direction == 1`； PE6对应通道2，**接近中心归位**， 对应`direction == 0`
+
+右路电机：
+
+Timer10控制，PF6对应通道1，**远离中心拉锥**，对应`direction == 1`; 
+
+Timer11，控制PF7对应通道1，**接近中心归位**，对应`direction == 0`；
+
+### 新ADC采样
+
+ADC3_IN6（PF8）和ADC3_IN7（PF9）
+
+## 新引脚对应
+
+|  信号线   |      对应I/O       |
+| :-------: | :----------------: |
+|    PE2    |        LED1        |
+|    PE3    |        LED0        |
+|    PE5    | TIM9_CH1 (L_PULL)  |
+|    PE6    |  TIM9_CH2 (L_RTN)  |
+|    PF0    |       FMC_A0       |
+|    PF1    |       FMC_A1       |
+|    PF2    |       FMC_A2       |
+|    PF3    |       FMC_A3       |
+|    PF4    |       FMC_A4       |
+|    PF5    |       FMC_A5       |
+|    PF6    | TIM10_CH1 (R_PULL) |
+|    PF7    | TIM11_CH1 (R_RTN)  |
+|    PF8    |      ADC3_IN6      |
+|    PF9    |      ADC3_IN7      |
+|   PF10    |       LCD_DE       |
+|  26...29  |                    |
+|  34...36  |                    |
+|    PA3    |       LCD_B5       |
+|    PA4    |     LCD_VSYNC      |
+|    41     |                    |
+|    PA6    |       LCD_G2       |
+|    PA7    |     FMC_SDNWE      |
+|    PC4    |     FMC_SDNE0      |
+|    PC5    |     FMC_SDCKE0     |
+|    PB0    |       LCD_R3       |
+|  47...48  |                    |
+|   PF11    |     FMC_SDNRAS     |
+|   PF12    |       FMC_A6       |
+|   PF13    |       FMC_A7       |
+|   PF14    |       FMC_A8       |
+|   PF15    |       FMC_A9       |
+|    PG0    |      FMC_A10       |
+|    PG1    |      FMC_A11       |
+|    PE7    |       FMC_D4       |
+|    PE8    |       FMC_D5       |
+|    PE9    |       FMC_D6       |
+|   PE10    |       FMC_D7       |
+|   PE11    |       FMC_D8       |
+|   PE12    |       FMC_D9       |
+|   PE13    |      FMC_D10       |
+|   PE14    |      FMC_D11       |
+|   PE15    |      FMC_D12       |
+|   PB10    |       LCD_G4       |
+|   PB11    |       LCD_G5       |
+|   PB12    |    T_SCK (GPIO)    |
+|   PB13    |   T_MISO (GPIO)    |
+|  75...76  |                    |
+|    PD8    |      FMC_D13       |
+|    PD9    |      FMC_D14       |
+|   PD10    |      FMC_D15       |
+|   PD11    |    T_PEN (GPIO)    |
+|    81     |                    |
+|   PD13    |      FMC_A18       |
+|   PD14    |       FMC_D0       |
+|   PD15    |       FMC_D1       |
+|    PG2    |      FMC_A12       |
+|    PG3    |   LCD_BL (GPIO)    |
+|    PG4    |      FMC_BA0       |
+|    PG5    |      FMC_BA1       |
+|    PG6    |       LCD_R7       |
+|    PG7    |      LCD_CLK       |
+|    PG8    |     FMC_SDCLK      |
+|    PC6    |     LCD_HSYNC      |
+|    PC7    |       LCD_G6       |
+|    PC8    |   T_MOSI (GPIO)    |
+|    PC9    |    T_CS (GPIO)     |
+|    PA8    |       LCD_R6       |
+|    PA9    |       LCD_R5       |
+|    102    |                    |
+|   PA11    |       LCD_R4       |
+|    104    |                    |
+|   PA13    |     JTMS-SWDIO     |
+|   PA14    |    JTC K-SWCLK     |
+|   PA15    |        JTDI        |
+| 111...113 |                    |
+|    PD0    |       FMC_D2       |
+|    PD1    |       FMC_D3       |
+| 116...117 |                    |
+|    PD4    |      FMC_NOE       |
+|    PD5    |      FMC_NWE       |
+|    122    |                    |
+|    PD7    |      FMC_NE1       |
+|    124    |                    |
+|   PG10    |       LCD_G3       |
+|   PG11    |       LCD_B3       |
+|   PG12    |       LCD_B4       |
+| 128...129 |                    |
+|   PG15    |     FMC_SDNCAS     |
+|    PB3    |   JTDO/TRACESWO    |
+|    PB4    |       NJTRST       |
+|    PB5    |       LCD_G7       |
+|    PB6    |     USART1_TX      |
+|    PB7    |     USART1_RX      |
+|    138    |       BOOT0        |
+|    PB8    |       LCD_B6       |
+|    PB9    |       LCD_B7       |
+|    PE0    |      FMC_NBL0      |
+|    PE1    |      FMC_NBL1      |
+
+
 
 ## 进度总览
 
@@ -234,9 +373,15 @@ typedef struct
 
 左路电机：Timer2控制，PA5对应通道1，**远离中心**，对应`direction == 1`； PA1对应通道2，**接近中心**， 对应`direction == 0`
 
-右路电机：Timer5控制，PH10对应通道1，**远离中心**，对应`direction == 1`; PH11对应通道2，**接近中心**，对应`direction == 0`
+右路电机：Timer5控制，PH10对应通道1，**远离中心**，对应`direction == 1`; PH11对应通道2，**接近中心**，对应`direction == 0`	
+
+<u>已改为PA2对应通道3，PA3对应通道4</u> 
 
 右路电机改成Timer5的CH3和CH4（如果使用RGB屏幕的话）PA2和PA3
+
+**可能还要改为TIM4_CH1和CH2：对应144引脚的136（PB6）和137（PB7）**
+
+
 
 左右电机独立控制界面（左禁止/启动按钮，右禁止/启动按钮 -->对应 `mode`）
 

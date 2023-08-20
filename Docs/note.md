@@ -778,15 +778,29 @@ IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配�
 
 `touch.h` 里的宏定义
 
-`gt9147.c` 的 `u8 GT9147_Init(void)` 里对PH7和PI8的操作
+对应芯片的`.c`和`.h`文件，这里以gt9147为例：
+
+- `gt9147.c` 的 `u8 GT9147_Init(void)` 里对PH7和PI8的操作
+
+- `gt9147.h` 里的宏定义
 
 `ctiic.c`  里面的函数：`void CT_IIC_Init(void)`
 
-`ctiic.h` 的宏定义
+`ctiic.h` 的宏定义，注意在设置SDA方向的宏时要根据自己的端口设置MODER寄存器的值，比如：
 
-**这些端口全部配置为GPIO，不需要复用！**
+```c
+//IO方向设置
+#define CT_SDA_IN()  {GPIOC->MODER&=~(3<<(8*2));GPIOC->MODER|=0<<8*2;}	//PC8输入模式
+#define CT_SDA_OUT() {GPIOC->MODER&=~(3<<(8*2));GPIOC->MODER|=1<<8*2;} 	//PC8输出模式
+```
+
+上面的操作是将PC8的对应的MODER位置零后写00（输入）或01（输出）。
+
+
 
 ### IO口配置
+
+**这些端口全部配置为GPIO，不需要复用！**
 
 <p style="color:red;font-weight:bold">注意：当修改GPIO时，您需要注意以下三点：
 <ol>
@@ -820,7 +834,7 @@ IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配�
 |  T_CS  | PC9（99）  |
 | T_PEN  | PD11（80） |
 
-ZGT6 (144 pins)：BL是PG3（88）
+
 
 ## 八、SDRAM
 

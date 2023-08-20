@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "ftm_framedlg.h": "c",
+        "dialog.h": "c",
+        "motorcontrol.h": "c",
+        "timer.h": "c",
+        "malloc.h": "c",
+        "led.h": "c",
+        "key.h": "c",
+        "tftlcd.h": "c",
+        "touch.h": "c",
+        "ctiic.h": "c",
+        "ltdc.h": "c",
+        "gt9147.h": "c",
+        "ott2001a.h": "c"
+    }
+}

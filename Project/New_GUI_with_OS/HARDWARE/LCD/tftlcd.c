@@ -1980,7 +1980,7 @@ void TFTLCD_Init(void)
 		FMC_Bank1E->BWTR[0]|=5<<0;	 	//地址建立时间(ADDSET)为5个HCLK =21ns  	 
 		FMC_Bank1E->BWTR[0]|=5<<8; 		//数据保存时间(DATAST)为4.6ns*4个HCLK=21ns
 	} 	
-	LCD_Display_Dir(0);		//默认为横屏
+	LCD_Display_Dir(0);		//默认为竖屏
 	LCD_LED(1);				//点亮背光
 	LCD_Clear(WHITE);
 }  

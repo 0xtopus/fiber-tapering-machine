@@ -3,6 +3,7 @@
         "timer.h": "c",
         "adc.h": "c",
         "ltdc.h": "c",
-        "touch.h": "c"
+        "touch.h": "c",
+        "motorcontrol.h": "c"
     }
 }

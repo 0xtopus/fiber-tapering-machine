@@ -2,6 +2,8 @@
 
 [STM32分步指南入门(Getting started with STM32: STM32 step-by-step)](https://wiki.stmicroelectronics.cn/stm32mcu/wiki/STM32StepByStep:Getting_started_with_STM32_:_STM32_step_by_step)
 
+
+
 # STM32芯片命名规则
 
 可见数据手册datasheet的第八章：《Ordering Information》
@@ -242,7 +244,7 @@ LCD_Display_Dir(1);		// 1为横屏显示，0为竖屏显示
 [法1](https://www.jianshu.com/p/bec48e0de882)<br>
 [法2](https://blog.csdn.net/zhuw86/article/details/89186272)
 
-1、配置仿真工程属性。成功打开工程后，右键单击SimulationTrial项目，在弹出的选项中选择属性，见图 配置emWin仿真工程属性；<br>
+1、配置仿真工程属性。成功打开工程后，右键单击SimulationTrial项目，在弹出的选项中选择属性，配置emWin仿真工程属性；<br>
 2、选择配置属性 > 链接器 > 输入<br> 
 3、在其中的附加依赖项中添加：`legacy_stdio_definitions.lib`，注意添加分号；<br>
 4、在忽略所有默认库中填：否；<br>
@@ -270,7 +272,7 @@ LCD_Display_Dir(1);		// 1为横屏显示，0为竖屏显示
 
 <br>
 
-## 三、GUIBuilder的使用
+## 三、使用模拟器查看GUIBuilder创建的页面
 可以参考《安富莱_STM32-V7开发板第3版emWin教程》第十一章的相关内容。
 
 ### 3.1 使用模拟器查看创建的界面
@@ -408,7 +410,7 @@ case WM_NOTIFY_PARENT:
 3. 打开FontConverter软件，选择字体类型，编码（比如Standard，16 Bit UNICODE)，点击确定，选择字体，字形和大小（比如“宋体”，“常规”，“16”），Unit of Size 可以选择Pixels，这样就可以手动添加点阵字体的大小
 4. 之后点击菜单栏上的“Edit”选项，点击“Disable all characters"
 5. 点击菜单栏上的“Edit”选项，点击"Read pattern file"，之后找到并选择你刚刚新建的记事本文件，比如我的是`FontSong16.txt`
-6. 点击File->Save as...，将你的字体文件保存为`.c`文件，文件名可自取，但不能包含中文
+6. 点击File->Save as...，将你的字体文件保存为`.c`文件，文件名可自取，但不能包含中文。如果出现提示说"This demo version will not produce a usable output file..."，那么你使用的是demo版本的FontConverter，请参考<a href="https://www.amobbs.com/thread-5501172-1-1.html">这个帖子</a>下载正式版。
 7. 创建好字体文件后，可以把字体文件放到你的界面文件的工程文件夹里了，下面介绍一下如何编辑代码使你界面里的控件可以显示你的字体
 8. 打开生成的字体 `.c ` 文件，你会看到一行类似这样的语句：
 ```c
@@ -522,7 +524,7 @@ void GUI_X_Config(void) {
 - [x] EEPROM用来干啥 --- 用于存储一些掉电不能丢失的重要数据，比如系统设置的一些参数/触摸屏的校准数据等等。
 - [x] 是否需要电压测试端？
 
-- [x] BOOT0和BOOT1
+- [x] BOOT0和BOOT1 --- 为什么要通过电阻接地: [STM32 programming and BOOT0 pin](https://electronics.stackexchange.com/questions/431871/stm32-programming-and-boot0-pin)
 
 - [x] 中文参考手册：VREF– 如果可用（**取决于封装**），则必须将其连接到 VSSA。？
 
@@ -818,7 +820,7 @@ IGT6 (176 pins) 控制背光的是**PB5**，在 `void TFTLCD_Init(void)` 里配�
 |  T_CS  | PC9（99）  |
 | T_PEN  | PD11（80） |
 
-BL是PG3（88）
+ZGT6 (144 pins)：BL是PG3（88）
 
 ## 八、SDRAM
 
@@ -841,12 +843,12 @@ BL是PG3（88）
   | FMC_D13 ~ D15 |             **PD8(77) / PD9(78) / PD10(79)**              |
   |   FMC_NBL0    |                       **PE0(141)**                        |
   |   FMC_NBL1    |                       **PE1(142)**                        |
-  |   FMC_SDNWE   |                PC0(26), **<u>PA7(43)</u>**                |
+  |   FMC_SDNWE   |           PC0(26), **<u>PA7(43)</u>**（原PC0）            |
   |  FMC_SDNCAS   |                       **PG15(132)**                       |
   |   FMC_SDCLK   |                        **PG8(93)**                        |
   |  FMC_SDNRAS   |                       **PF11(49)**                        |
-  |  FMC_SDCKE0   |                PC3(29), **<u>PC5(45)</u>**                |
-  |   FMC_SDNE0   |                PC2(28), **<u>PC4(44)</u>**                |
+  |  FMC_SDCKE0   |           PC3(29), **<u>PC5(45)</u>** （原PC3）           |
+  |   FMC_SDNE0   |           PC2(28), **<u>PC4(44)</u>** （原PC2）           |
   |    FMC_BA0    |                        **PG4(89)**                        |
   |    FMC_BA1    |                        **PG5(90)**                        |
   |  **FMC_A10**  |                        **PG0(56)**                        |
@@ -907,7 +909,9 @@ BL是PG3（88）
 
 [硬件电路焊接----整体焊接布局介绍--海创电子](https://www.bilibili.com/video/BV1XJ41157Sh/?spm_id_from=333.788.recommend_more_video.3)
 
+## 芯片方向
 
+[如何分辨stm32芯片的方向](https://blog.csdn.net/qlexcel/article/details/51114124)
 
 ## 单片机上电不运行怎么办
 
@@ -1013,4 +1017,8 @@ DMA不起效果：有可能是L1-Cache的问题，见：[STM32H7 ADC with DMA re
 
 - 最小系统板：minimum system board
 
-- 
+
+
+[介绍各种编程和硬件的专栏，CAN总线的介绍非常不错](https://www.zhihu.com/people/yizhi-bu-gan-xian-zhuang-de-zhu/posts)
+
+[spi介绍](https://www.analog.com/cn/analog-dialogue/articles/introduction-to-spi-interface.html)

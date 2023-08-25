@@ -512,6 +512,11 @@ void GUI_X_Config(void) {
 
 # 原理图绘制
 
+### 错误和教训
+
+- 排针间距！
+- usb接口！
+
 [Getting started with STM32F7 Series MCU hardware development(AN4661)](https://www.st.com/resource/en/application_note/dm00164549-getting-started-with-stm32f7-series-mcu-hardware-development-stmicroelectronics.pdf)
 
 [电路板铺地时PCB 地加强孔需不需要打](https://zhidao.baidu.com/question/223418452.html)

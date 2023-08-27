@@ -117,6 +117,7 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     // Initialization of 'FTM_Frame'
     //
     hItem = pMsg->hWin;
+    FRAMEWIN_SetText(hItem, "Waveform");
     FRAMEWIN_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
     //
     // Initialization of 'Graph'
@@ -145,8 +146,9 @@ static void _cbDialog(WM_MESSAGE *pMsg)
     GRAPH_AttachScale(hItem, hScaleH); // 将刻度对象附加到图形小工具
 
     oscilldev.resolut = (float)3300 / 4096; // STM32的AD为12位，那么每个AD值为3300/4096=0.806mv
-    oscilldev.div = 50;                    // 一格为0.1 ms
-    TIM3_Init(oscilldev.div - 1, 108 - 1);  // 初始化TIM3, 采样率10kHz
+    oscilldev.div = 50;                    // 一格为50 us
+    TIM3_Init(oscilldev.div - 1, 108 - 1);  // 初始化TIM3, 采样率20kHz
+    MotorInit();
     // USER START (Optionally insert additional code for further widget initialization)
     //
     // Initialization of 'SingCtrl_Win'
@@ -217,16 +219,16 @@ void MainTask(void)
 	oscilldev.buffer=mymalloc(SRAMIN,oscilldev.dataxsize*4);	//申请内存
   while (1)
   {
-/*     if (oscilldev.adflag == 1)
+    if (oscilldev.adflag == 1)
     {
       for (i = 0; i < oscilldev.dataxsize; i++)
       {
-        // 向GRAPH图形小工具添加数据,注意要缩20倍，因为垂直坐标扩大(缩放)20倍，
-        GRAPH_DATA_YT_AddValue(oscilldev.graphdata, oscilldev.buffer[i] / 20);
+        // 向GRAPH图形小工具添加数据,缩20倍并向上平移100格，则-80刻度对应的实际ADC口的电压是0V，80多一点儿的地方对应的实际ADC电压是3.3V
+        GRAPH_DATA_YT_AddValue(oscilldev.graphdata, oscilldev.buffer[i] / 20 + 100);
       }
       memset(oscilldev.buffer, 0, oscilldev.dataxsize); // 清空buffer
       oscilldev.adflag = 0;
-    } */
+    }
     GUI_Delay(100);
   }
 }

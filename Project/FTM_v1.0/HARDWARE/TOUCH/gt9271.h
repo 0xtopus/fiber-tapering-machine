@@ -2,23 +2,16 @@
 #define __GT9271_H	
 #include "sys.h"	
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32H7开发板
 //10.1寸电容触摸屏-GT9271 驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2018/7/16
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved									  
+//版本：V1.1
+//更新说明：适配拉锥机							  
 ////////////////////////////////////////////////////////////////////////////////// 
 
 
 
 //IO操作函数	 
-#define GT9271_RST(n)  		 (n?HAL_GPIO_WritePin(GPIOI,GPIO_PIN_8,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOI,GPIO_PIN_8,GPIO_PIN_RESET))//GT9147复位引脚
-#define GT9271_INT    		 HAL_GPIO_ReadPin(GPIOH,GPIO_PIN_7)  //GT9147中断引脚		
+#define GT9271_RST(n)  		 (n?HAL_GPIO_WritePin(GPIOC,GPIO_PIN_9,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOC,GPIO_PIN_9,GPIO_PIN_RESET))//GT9147复位引脚
+#define GT9271_INT    		 HAL_GPIO_ReadPin(GPIOD,GPIO_PIN_11)  //GT9147中断引脚		
  
 //I2C读写命令	
 #define GT9271_CMD_WR 		0X28    	//写命令

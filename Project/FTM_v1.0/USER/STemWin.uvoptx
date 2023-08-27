@@ -149,25 +149,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>99</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134339468</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Template\main.c\99</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
           <LineNumber>210</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134267450</Address>
+          <Address>134267974</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -179,43 +163,11 @@
           <Expression>\\Template\../EMWIN/Demo/FTM_FrameDLG.c\210</Expression>
         </Bp>
         <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1488</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134290040</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\HARDWARE\LCD\tftlcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Template\../HARDWARE/LCD/tftlcd.c\1488</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>1899</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134293880</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\HARDWARE\LCD\tftlcd.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Template\../HARDWARE/LCD/tftlcd.c\1899</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
+          <Number>1</Number>
           <Type>0</Type>
           <LineNumber>230</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134267496</Address>
+          <Address>134268020</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -225,6 +177,38 @@
           <Filename>..\EMWIN\Demo\FTM_FrameDLG.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\Template\../EMWIN/Demo/FTM_FrameDLG.c\230</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>100</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134339992</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Template\main.c\100</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>130</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134232148</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\HARDWARE\TOUCH\gt9147.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Template\../HARDWARE/TOUCH/gt9147.c\130</Expression>
         </Bp>
       </Breakpoint>
       <Tracepoint>
@@ -453,6 +437,38 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>..\HARDWARE\LCD\tftlcd.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>100</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>6</Number>
+          <Type>0</Type>
+          <LineNumber>130</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\HARDWARE\TOUCH\gt9147.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>

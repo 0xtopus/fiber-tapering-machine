@@ -16,8 +16,8 @@
 
 
 //IO操作函数	
-#define OTT_RST(n)  (n?HAL_GPIO_WritePin(GPIOI,GPIO_PIN_8,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOI,GPIO_PIN_8,GPIO_PIN_RESET))//OTT2001A复位引脚
-#define OTT_INT      HAL_GPIO_ReadPin(GPIOH,GPIO_PIN_7)  //OTT2001A断引脚		
+#define OTT_RST(n)  (n?HAL_GPIO_WritePin(GPIOC,GPIO_PIN_9,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOC,GPIO_PIN_9,GPIO_PIN_RESET))//OTT2001A复位引脚
+#define OTT_INT      HAL_GPIO_ReadPin(GPIOD,GPIO_PIN_11)  //OTT2001A断引脚		
   
 //通过OTT_SET_REG指令,可以查询到这个信息 
 //注意,这里的X,Y和屏幕的坐标系刚好是反的.

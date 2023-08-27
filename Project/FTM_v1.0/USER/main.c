@@ -16,7 +16,9 @@
 #include "adc.h"
 #include "includes.h"
 /************************************************
- ALIENTEK STM32开发板STemWin实验
+ 拉锥机主函数
+ 
+ 基于 ALIENTEK STM32开发板STemWin实验
  STemWin STemWin+UCOSIII移植实验
  
  UCOSIII中以下优先级用户程序不能使用，ALIENTEK
@@ -26,11 +28,6 @@
  优先级2：定时任务 OS_TmrTask()
  优先级OS_CFG_PRIO_MAX-2：统计任务 OS_StatTask()
  优先级OS_CFG_PRIO_MAX-1：空闲任务 OS_IdleTask()
- 技术支持：www.openedv.com
- 淘宝店铺：http://eboard.taobao.com  
- 关注微信公众平台微信号："正点原子"，免费获取STM32资料。
- 广州市星翼电子科技有限公司  
- 作者：正点原子 @ALIENTEK
 ************************************************/
 
 //任务优先级

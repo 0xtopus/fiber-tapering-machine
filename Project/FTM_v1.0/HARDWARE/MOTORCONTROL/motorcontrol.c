@@ -1,12 +1,15 @@
 #include "motorcontrol.h"
-#include "led.h"
-#include "timer.h"
+
+//////////////////////////////////////////////////////////////////////////////////	 
+// 电机控制代码	
+// 为emWin图形界面提供控制底层硬件的API
+////////////////////////////////////////////////////////////////////////////////// 	
 
 MotorControlStruct MotorConfig;
 
 /**
  * Init MotorConfig
-*/
+ */
 u8 MotorInit(void)
 {
     MotorConfig.direction = GET_CLOSER;
@@ -23,29 +26,49 @@ u8 MotorInit(void)
  */
 u8 ChangeDirection(void)
 {
-    if (MotorConfig.real_left_speed && MotorConfig.real_right_speed)
+    u8 leftflag = 0;
+    u8 rightflag = 0;
+    u16 temp_real_left_speed = MotorConfig.real_left_speed;
+    u16 temp_real_right_speed = MotorConfig.real_right_speed;
+
+    if (MotorConfig.real_left_speed)
     {
         StopSpecificMotor(LEFT_MOTOR);
-        StopSpecificMotor(RIGHT_MOTOR);
-        MotorConfig.direction = !MotorConfig.direction;
-        StartSpecificMotor(LEFT_MOTOR);
-        StartSpecificMotor(RIGHT_MOTOR);
+        leftflag = 1;      
     } 
-    else if (MotorConfig.real_left_speed && !MotorConfig.real_right_speed)
-    {
-        StopSpecificMotor(LEFT_MOTOR);
-        MotorConfig.direction = !MotorConfig.direction;
-        StartSpecificMotor(LEFT_MOTOR);
-    }
-    else if (!MotorConfig.real_left_speed && MotorConfig.real_right_speed)
+
+    if (MotorConfig.real_right_speed)
     {
         StopSpecificMotor(RIGHT_MOTOR);
-        MotorConfig.direction = !MotorConfig.direction;
-        StartSpecificMotor(RIGHT_MOTOR);
+        rightflag = 1;
     }
-    else
+
+    MotorConfig.direction = !MotorConfig.direction;
+    
+    if (leftflag)
     {
-        MotorConfig.direction = !MotorConfig.direction;
+        MotorConfig.real_left_speed = temp_real_left_speed;
+        if (MotorConfig.direction)
+        {
+            TIM4_PWM_Init(MotorConfig.real_left_speed - 1, 108 - 1, GET_AWAY);   // TIM4CLK = APB1 * 2 = 108Mhz
+        }
+        else
+        {
+            TIM4_PWM_Init(MotorConfig.real_left_speed - 1, 108 - 1, GET_CLOSER);
+        }
+    }
+
+    if (rightflag)
+    {
+        MotorConfig.real_right_speed = temp_real_right_speed;
+        if (MotorConfig.direction)
+        {
+            TIM9_PWM_Init(MotorConfig.real_right_speed - 1, 216 - 1, GET_AWAY);  // TIM9CLK = APB2 * 2 = 216Mhz
+        }
+        else
+        {
+            TIM9_PWM_Init(MotorConfig.real_right_speed - 1, 216 - 1, GET_CLOSER);
+        }
     }
     
     return MotorConfig.direction;
@@ -61,11 +84,11 @@ u8 StopSpecificMotor(u8 the_given_motor)
     {
         if (MotorConfig.direction)
         {
-            HAL_TIM_PWM_Stop(TIM_RIGHT_HANDLE, TIM_CHANNEL_3);
+            HAL_TIM_PWM_Stop(TIM_RIGHT_HANDLE, TIM_CHANNEL_1);
         }
         else
         {
-            HAL_TIM_PWM_Stop(TIM_RIGHT_HANDLE, TIM_CHANNEL_4);
+            HAL_TIM_PWM_Stop(TIM_RIGHT_HANDLE, TIM_CHANNEL_2);
         }
         MotorConfig.real_right_speed = 0;
     }
@@ -92,28 +115,28 @@ u8 StopSpecificMotor(u8 the_given_motor)
 u8 StartSpecificMotor(u8 the_given_motor)
 {
     // Right motor starts to run
-    if (the_given_motor == 1 && !MotorConfig.real_right_speed)
+    if (the_given_motor == RIGHT_MOTOR && !MotorConfig.real_right_speed)
     {
         if (MotorConfig.direction)
         {
-            TIM5_PWM_Init(MotorConfig.set_right_speed - 1, 108 - 1, GET_AWAY);
+            TIM9_PWM_Init(MotorConfig.set_right_speed - 1, 216 - 1, GET_AWAY);  // TIM9CLK = APB2 * 2 = 216Mhz
         }
         else
         {
-            TIM5_PWM_Init(MotorConfig.set_right_speed - 1, 108 - 1, GET_CLOSER);
+            TIM9_PWM_Init(MotorConfig.set_right_speed - 1, 216 - 1, GET_CLOSER);
         }
         MotorConfig.real_right_speed = MotorConfig.set_right_speed;
     }
     // Left motor starts to run
-    else if (the_given_motor == 0 && !MotorConfig.real_left_speed)
+    else if (the_given_motor == LEFT_MOTOR && !MotorConfig.real_left_speed)
     {
         if (MotorConfig.direction)
         {
-            TIM2_PWM_Init(MotorConfig.set_left_speed - 1, 108 - 1, GET_AWAY);
+            TIM4_PWM_Init(MotorConfig.set_left_speed - 1, 108 - 1, GET_AWAY);   // TIM4CLK = APB1 * 2 = 108Mhz
         }
         else
         {
-            TIM2_PWM_Init(MotorConfig.set_left_speed - 1, 108 - 1, GET_CLOSER);
+            TIM4_PWM_Init(MotorConfig.set_left_speed - 1, 108 - 1, GET_CLOSER);
         }
         MotorConfig.real_left_speed = MotorConfig.set_left_speed;
     }
@@ -123,7 +146,7 @@ u8 StartSpecificMotor(u8 the_given_motor)
 }
 
 
-//! The frequency of timer is 108M/108=1M,
+//! The frequency of timer is 108M/108=1M or 216M/216 = 1M,
 //! if reload value = 1000, then PWM frequency is 1M/1000=1kHZ
 //! So the range of PWM frequency is 200Hz ~ 2kHz
 /**
@@ -134,18 +157,19 @@ u8 StartSpecificMotor(u8 the_given_motor)
  */
 u16 ChangeSpecificSpeed(u16 set_value, u8 the_given_motor)
 {
+    // Convert the set value to reload value
     u16 set_speed = -set_value + 5500;
     // Change the right motor speed
-    if (the_given_motor)
+    if (the_given_motor == RIGHT_MOTOR)
     {
         MotorConfig.set_right_speed = set_speed;
-        if (MotorConfig.real_right_speed)
+        if (MotorConfig.real_right_speed)   // if the motor is operating
         {
             UpdateSpecificRealSpeed(set_speed, the_given_motor);
         }
     }
     // Change the left motor speed
-    else
+    else if (the_given_motor == LEFT_MOTOR) // if the motor is operating
     {
         MotorConfig.set_left_speed = set_speed;
         if (MotorConfig.real_left_speed)
@@ -177,7 +201,7 @@ u16 UpdateSpecificRealSpeed(u16 new_speed, u8 the_given_motor)
 
 /**
  * Get the state or value of a specific item of MotorConfig.
- * @param item the item of MotorConfig.
+ * @param item the item of MotorConfig struct.
  * @return the item's state or value.
  */
 u16 GetMotorConfig(MotorItems item)
@@ -185,22 +209,26 @@ u16 GetMotorConfig(MotorItems item)
     u16 res;
     switch (item)
     {
-    case 0:
-        res = MotorConfig.set_left_speed;
-        break;
-
-    case 1:
-        res = MotorConfig.set_right_speed;
-        break;
-
-    case 2:
+    case REAL_LEFT_SPEED:
         /* real_left_speed */
         res = MotorConfig.real_left_speed;
         break;
 
-    case 3:
+    case REAL_RIGHT_SPEED:
         /* real_right_speed */
         res = MotorConfig.real_right_speed;
+        break;
+
+    case SET_LEFT_SPEED:
+        res = MotorConfig.set_left_speed;
+        break;
+
+    case SET_RIGHT_SPEED:
+        res = MotorConfig.set_right_speed;
+        break;
+
+    case DIRECTION:
+        res = MotorConfig.direction;
         break;
     }
     return res;
@@ -208,7 +236,7 @@ u16 GetMotorConfig(MotorItems item)
 
 /**
  * Set a specific item of MotorConfig with a new state or value.
- * @param item the item of MotorConfig.
+ * @param item the item of MotorConfig struct.
  * @param new_state new state or value.
  * @return the item's new state or value.
  */
@@ -217,29 +245,33 @@ u16 SetMotorConfig(MotorItems item, u16 new_state)
     u16 res;
     switch (item)
     {
-    case 0:
-        /* set_left_speed  */
-        MotorConfig.set_left_speed = new_state;
-        res = MotorConfig.set_left_speed;
-        break;
-
-    case 1:
-        /* set_right_speed  */
-        MotorConfig.set_right_speed = new_state;
-        res = MotorConfig.set_right_speed;
-        break;
-
-    case 2:
+    case REAL_LEFT_SPEED:
         /* real_left_speed */
         MotorConfig.real_left_speed = new_state;
         res = MotorConfig.real_left_speed;
         break;
 
-    case 3:
+    case REAL_RIGHT_SPEED:
         /* real_right_speed */
         MotorConfig.real_right_speed = new_state;
         res = MotorConfig.real_right_speed;
         break;
+
+    case SET_LEFT_SPEED:
+        /* set_left_speed  */
+        MotorConfig.set_left_speed = new_state;
+        res = MotorConfig.set_left_speed;
+        break;
+
+    case SET_RIGHT_SPEED:
+        /* set_right_speed  */
+        MotorConfig.set_right_speed = new_state;
+        res = MotorConfig.set_right_speed;
+        break;
+        
+    case DIRECTION:
+        MotorConfig.direction = new_state;
+        res = MotorConfig.direction;
     }
 
     return res;

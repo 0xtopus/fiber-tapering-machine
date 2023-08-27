@@ -19,8 +19,8 @@
 
 //与电容触摸屏连接的芯片引脚(未包含IIC引脚) 
 //IO操作函数	  
-#define FT_RST(n)  (n?HAL_GPIO_WritePin(GPIOI,GPIO_PIN_8,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOI,GPIO_PIN_8,GPIO_PIN_RESET))//FT5206复位引脚
-#define FT_INT      HAL_GPIO_ReadPin(GPIOH,GPIO_PIN_7)  //FT5206断引脚	
+#define FT_RST(n)  (n?HAL_GPIO_WritePin(GPIOC,GPIO_PIN_9,GPIO_PIN_SET):HAL_GPIO_WritePin(GPIOC,GPIO_PIN_9,GPIO_PIN_RESET))//FT5206复位引脚
+#define FT_INT      HAL_GPIO_ReadPin(GPIOD,GPIO_PIN_11)  //FT5206断引脚	
    
 //I2C读写命令	
 #define FT_CMD_WR 				0X70    	//写命令

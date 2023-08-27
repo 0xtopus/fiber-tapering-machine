@@ -12,6 +12,9 @@
         "ctiic.h": "c",
         "ltdc.h": "c",
         "gt9147.h": "c",
-        "ott2001a.h": "c"
+        "ott2001a.h": "c",
+        "ft5206.h": "c",
+        "gt9271.h": "c",
+        "adc.h": "c"
     }
 }

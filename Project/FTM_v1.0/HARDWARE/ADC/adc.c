@@ -2,20 +2,11 @@
 #include "delay.h"
 
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F7开发板
-//ADC驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2015/12/26
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved									  
+//ADC驱动代码 -- 芯片F767ZGT6	
+// 基于ALIENTEK STM32F7开发板代码模板 
 ////////////////////////////////////////////////////////////////////////////////// 	
 
 ADC_HandleTypeDef ADC3_Handler;     //! ADC句柄
-float adc_buff[ADC_BUFF_SIZE];
 u8 adc_flag = 0;    // 采样完成标志
 
 
@@ -49,7 +40,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC3_CLK_ENABLE();            //!使能ADC3时钟
     __HAL_RCC_GPIOF_CLK_ENABLE();			//!开启GPIOF时钟
 	
-    GPIO_Initure.Pin=GPIO_PIN_6;            //! PF6
+    GPIO_Initure.Pin=GPIO_PIN_8;            //! PF8
     GPIO_Initure.Mode=GPIO_MODE_ANALOG;     //模拟
     GPIO_Initure.Pull=GPIO_NOPULL;          //不带上下拉
     HAL_GPIO_Init(GPIOF,&GPIO_Initure);     //! 初始化GPIO
@@ -90,6 +81,7 @@ u16 Get_Adc_Average(u32 ch,u8 times)
 	return temp_val/times;
 }
 
+//deprecated
 void Display_Adc_Value(u32 ch, u8 times)
 {
     u16 adcx;
@@ -112,6 +104,7 @@ void Display_Adc_Value(u32 ch, u8 times)
     //LED0_Toggle;
 } 
 
+//deprecated
 void Display_Freq_Value(float value)
 {
     u16 temp;
